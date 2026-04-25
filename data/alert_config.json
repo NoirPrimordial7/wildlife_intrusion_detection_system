@@ -1,0 +1,24 @@
+{
+  "dangerous_animals": [
+    "Tiger",
+    "Leopard",
+    "Lion",
+    "Bear",
+    "Brown bear",
+    "Polar bear",
+    "Elephant",
+    "boar",
+    "Snake",
+    "Crocodile",
+    "Wolf",
+    "Hyena",
+    "Rhinoceros",
+    "Hippopotamus"
+  ],
+  "confidence_threshold": 0.70,
+  "alert_cooldown_seconds": 120,
+  "required_repeated_detections": 3,
+  "camera_id": "CAM_01",
+  "camera_location": "Village Border Camera"
+}
+

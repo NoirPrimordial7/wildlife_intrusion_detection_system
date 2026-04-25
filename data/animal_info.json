@@ -1,0 +1,2605 @@
+{
+  "animals": [
+    {
+      "name": "Bear",
+      "details": {
+        "SCIENTIFIC_NAME": "URSIDAE",
+        "FAMILY": "URSIDAE",
+        "LIFESPAN": "20-30 YEARS (IN THE WILD)",
+        "HABITAT": "FORESTS, MOUNTAINS, ARCTIC REGIONS, AND GRASSLANDS",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Black Sea Sprat",
+      "details": {
+        "SCIENTIFIC_NAME": "SPRATTUS SPRATTUS",
+        "FAMILY": "CLUPEIDAE",
+        "LIFESPAN": "3-4 YEARS",
+        "HABITAT": "BLACK SEA",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Brown Bear",
+      "details": {
+        "SCIENTIFIC_NAME": "URSUS ARCTOS",
+        "FAMILY": "URSIDAE",
+        "LIFESPAN": "20-30 YEARS (IN THE WILD)",
+        "HABITAT": "FORESTS, MOUNTAINS, AND GRASSLANDS",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Bull",
+      "details": {
+        "SCIENTIFIC_NAME": "BOS TAURUS",
+        "FAMILY": "BOVIDAE",
+        "LIFESPAN": "15-20 YEARS",
+        "HABITAT": "FARMS, GRASSLANDS",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Butterfly",
+      "details": {
+        "SCIENTIFIC_NAME": "LEPIDOPTERA",
+        "FAMILY": "VARIOUS",
+        "LIFESPAN": "1-2 WEEKS",
+        "HABITAT": "GARDENS, MEADOWS, FORESTS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Camel",
+      "details": {
+        "SCIENTIFIC_NAME": "CAMELUS",
+        "FAMILY": "CAMELIDAE",
+        "LIFESPAN": "40-50 YEARS",
+        "HABITAT": "DESERTS, SEMI-ARID REGIONS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Canary",
+      "details": {
+        "SCIENTIFIC_NAME": "SERINUS CANARIA",
+        "FAMILY": "FRINGILLIDAE",
+        "LIFESPAN": "10-15 YEARS",
+        "HABITAT": "FORESTS, MOUNTAINS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Caterpillar",
+      "details": {
+        "SCIENTIFIC_NAME": "LARVAL STAGE OF LEPIDOPTERA",
+        "FAMILY": "VARIOUS",
+        "LIFESPAN": "VARIES (DEPENDING ON SPECIES)",
+        "HABITAT": "ON PLANTS, GRASS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Cattle",
+      "details": {
+        "SCIENTIFIC_NAME": "BOS TAURUS",
+        "FAMILY": "BOVIDAE",
+        "LIFESPAN": "15-20 YEARS",
+        "HABITAT": "FARMS, GRASSLANDS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Centipede",
+      "details": {
+        "SCIENTIFIC_NAME": "SCOLOPENDRIDAE",
+        "FAMILY": "SCOLOPENDRIDAE",
+        "LIFESPAN": "1-6 YEARS",
+        "HABITAT": "UNDER ROCKS, LEAVES, IN CAVES",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Cheetah",
+      "details": {
+        "SCIENTIFIC_NAME": "ACINONYX JUBATUS",
+        "FAMILY": "FELIDAE",
+        "LIFESPAN": "10-12 YEARS",
+        "HABITAT": "SAVANNAH, GRASSLANDS",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Chicken",
+      "details": {
+        "SCIENTIFIC_NAME": "GALLUS GALLUS DOMESTICUS",
+        "FAMILY": "PHASIANIDAE",
+        "LIFESPAN": "5-10 YEARS",
+        "HABITAT": "FARMS, BACKYARDS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Crab",
+      "details": {
+        "SCIENTIFIC_NAME": "Brachyura",
+        "FAMILY": "VARIOUS",
+        "LIFESPAN": "1-10 YEARS (DEPENDING ON SPECIES)",
+        "HABITAT": "SHORELINES, MARINE ENVIRONMENTS",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Crocodile",
+      "details": {
+        "SCIENTIFIC_NAME": "CROCODYLIA",
+        "FAMILY": "CROCODYLIDAE",
+        "LIFESPAN": "60-70 YEARS",
+        "HABITAT": "RIVERS, LAKES, AND SWAMPS",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Deer",
+      "details": {
+        "SCIENTIFIC_NAME": "CERVIDAE",
+        "FAMILY": "CERVIDAE",
+        "LIFESPAN": "10-20 YEARS",
+        "HABITAT": "FORESTS, GRASSLANDS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Duck",
+      "details": {
+        "SCIENTIFIC_NAME": "ANAS",
+        "FAMILY": "ANATIDAE",
+        "LIFESPAN": "5-10 YEARS",
+        "HABITAT": "LAKES, PONDS, RIVERS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Eagle",
+      "details": {
+        "SCIENTIFIC_NAME": "AQUILA CHRYSAETOS",
+        "FAMILY": "ACCIPITRIDAE",
+        "LIFESPAN": "20-30 YEARS",
+        "HABITAT": "MOUNTAINS, COASTLINES",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Elephant",
+      "details": {
+        "SCIENTIFIC_NAME": "ELEPHAS",
+        "FAMILY": "ELEPHANTIDAE",
+        "LIFESPAN": "60-70 YEARS",
+        "HABITAT": "SAVANNAH, FORESTS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Fish",
+      "details": {
+        "SCIENTIFIC_NAME": "VARIOUS SPECIES",
+        "FAMILY": "VARIOUS",
+        "LIFESPAN": "1-20 YEARS (DEPENDING ON SPECIES)",
+        "HABITAT": "OCEANS, RIVERS, LAKES",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Fox",
+      "details": {
+        "SCIENTIFIC_NAME": "VULPES VULPES",
+        "FAMILY": "CANIDAE",
+        "LIFESPAN": "3-4 YEARS (IN THE WILD)",
+        "HABITAT": "FORESTS, GRASSLANDS, AND DESERTS",
+        "HOSTILE": true
+      }
+    },
+    {
+      "name": "Frog",
+      "details": {
+        "SCIENTIFIC_NAME": "ANURA",
+        "FAMILY": "RANIDAE",
+        "LIFESPAN": "4-15 YEARS",
+        "HABITAT": "PONDS, SWAMPS, FORESTS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Gilt Head Bream",
+      "details": {
+        "SCIENTIFIC_NAME": "SPARUS AURATA",
+        "FAMILY": "SPARIDAE",
+        "LIFESPAN": "7-10 YEARS",
+        "HABITAT": "MEDITERRANEAN SEA",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Giraffe",
+      "details": {
+        "SCIENTIFIC_NAME": "GIRAFFA CAMELOPARDALIS",
+        "FAMILY": "GIRAFFIDAE",
+        "LIFESPAN": "25-30 YEARS",
+        "HABITAT": "SAVANNAH, WOODED GRASSLANDS",
+        "HOSTILE": false
+      }
+    },
+    {
+      "name": "Goat",
+      "details": {
+        "SCIENTIFIC_NAME": "CAPRA AEGAGRUS HIRCUS",
+        "FAMILY": "BOVIDAE",
+        "LIFESPAN": "15-18 YEARS",
+        "HABITAT": "MOUNTAINOUS REGIONS",
+        "HOSTILE": false
+      }
+    },
+        {
+          "name": "Goldfish",
+          "details": {
+            "SCIENTIFIC_NAME": "CARASSIUS AURATUS",
+            "FAMILY": "CYPRINIDAE",
+            "LIFESPAN": "10-15 YEARS",
+            "HABITAT": "FRESHWATER",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Goose",
+          "details": {
+            "SCIENTIFIC_NAME": "ANSER",
+            "FAMILY": "ANATIDAE",
+            "LIFESPAN": "10-25 YEARS",
+            "HABITAT": "LAKES, PONDS, GRASSLANDS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Hamster",
+          "details": {
+            "SCIENTIFIC_NAME": "MESOCRICETUS AURATUS",
+            "FAMILY": "CRICETIDAE",
+            "LIFESPAN": "2-3 YEARS",
+            "HABITAT": "DESERTS, GRASSLANDS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Harbor Seal",
+          "details": {
+            "SCIENTIFIC_NAME": "PHOCA VITULINA",
+            "FAMILY": "PHOCIDAE",
+            "LIFESPAN": "25-30 YEARS",
+            "HABITAT": "COASTLINES",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Hedgehog",
+          "details": {
+            "SCIENTIFIC_NAME": "ERINACEUS EUROPAEUS",
+            "FAMILY": "ERINACEIDAE",
+            "LIFESPAN": "3-7 YEARS",
+            "HABITAT": "FORESTS, GARDENS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Hippopotamus",
+          "details": {
+            "SCIENTIFIC_NAME": "HIPPOPOTAMUS AMPHIBIUS",
+            "FAMILY": "HIPPOPOTAMIDAE",
+            "LIFESPAN": "40-50 YEARS",
+            "HABITAT": "RIVERS, LAKES",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Horse",
+          "details": {
+            "SCIENTIFIC_NAME": "EQUUS FERUS CABALLUS",
+            "FAMILY": "EQUIDAE",
+            "LIFESPAN": "25-30 YEARS",
+            "HABITAT": "GRASSLANDS, FARMS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Horse Mackerel",
+          "details": {
+            "SCIENTIFIC_NAME": "TRACHURUS TRACHURUS",
+            "FAMILY": "CARANGIDAE",
+            "LIFESPAN": "10-15 YEARS",
+            "HABITAT": "OCEANS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Jaguar",
+          "details": {
+            "SCIENTIFIC_NAME": "PANTHERA ONCA",
+            "FAMILY": "FELIDAE",
+            "LIFESPAN": "12-15 YEARS",
+            "HABITAT": "RAINFORESTS, SAVANNAHS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Jellyfish",
+          "details": {
+            "SCIENTIFIC_NAME": "SCYPHOZOA",
+            "FAMILY": "SCYPHOZOIDAE",
+            "LIFESPAN": "1-3 YEARS",
+            "HABITAT": "OCEANS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Kangaroo",
+          "details": {
+            "SCIENTIFIC_NAME": "MACROPUS",
+            "FAMILY": "MACROPODIDAE",
+            "LIFESPAN": "6-8 YEARS",
+            "HABITAT": "GRASSLANDS, DESERTS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Koala",
+          "details": {
+            "SCIENTIFIC_NAME": "PHASCOLARCTOS CINEREUS",
+            "FAMILY": "PHASCOLARCTIDAE",
+            "LIFESPAN": "10-12 YEARS",
+            "HABITAT": "EUCALYPTUS FORESTS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Ladybug",
+          "details": {
+            "SCIENTIFIC_NAME": "COCCINELLIDAE",
+            "FAMILY": "COCCINELLIDAE",
+            "LIFESPAN": "1-2 YEARS",
+            "HABITAT": "GARDENS, FIELDS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Leopard",
+          "details": {
+            "SCIENTIFIC_NAME": "PANTHERA PARDUS",
+            "FAMILY": "FELIDAE",
+            "LIFESPAN": "12-17 YEARS",
+            "HABITAT": "FORESTS, GRASSLANDS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Lion",
+          "details": {
+            "SCIENTIFIC_NAME": "PANTHERA LEO",
+            "FAMILY": "FELIDAE",
+            "LIFESPAN": "10-14 YEARS",
+            "HABITAT": "SAVANNAH, GRASSLANDS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Lizard",
+          "details": {
+            "SCIENTIFIC_NAME": "LACERTILIA",
+            "FAMILY": "LACERTIDAE",
+            "LIFESPAN": "5-20 YEARS",
+            "HABITAT": "DESERTS, GRASSLANDS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Lynx",
+          "details": {
+            "SCIENTIFIC_NAME": "LYNX",
+            "FAMILY": "FELIDAE",
+            "LIFESPAN": "10-15 YEARS",
+            "HABITAT": "FORESTS, MOUNTAINS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Magpie",
+          "details": {
+            "SCIENTIFIC_NAME": "PICA PICA",
+            "FAMILY": "CORVIDAE",
+            "LIFESPAN": "3-5 YEARS",
+            "HABITAT": "FORESTS, FARMLANDS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Monkey",
+          "details": {
+            "SCIENTIFIC_NAME": "CERCOPITHECOIDEA",
+            "FAMILY": "CERCOPITHECIDAE",
+            "LIFESPAN": "15-45 YEARS",
+            "HABITAT": "RAINFORESTS, GRASSLANDS",
+            "HOSTILE": true
+          }
+        },
+        {
+          "name": "Moths and butterflies",
+          "details": {
+            "SCIENTIFIC_NAME": "LEPIDOPTERA",
+            "FAMILY": "VARIOUS",
+            "LIFESPAN": "VARIES (DAYS TO WEEKS)",
+            "HABITAT": "GARDENS, MEADOWS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Mouse",
+          "details": {
+            "SCIENTIFIC_NAME": "MUS MUSCULUS",
+            "FAMILY": "MURIDAE",
+            "LIFESPAN": "1-3 YEARS",
+            "HABITAT": "HOUSES, FARMS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Mule",
+          "details": {
+            "SCIENTIFIC_NAME": "EQUUS FERUS CABALLUS",
+            "FAMILY": "EQUIDAE",
+            "LIFESPAN": "20-30 YEARS",
+            "HABITAT": "FARMS, DESERTS",
+            "HOSTILE": false
+          }
+        },
+        {
+          "name": "Ostrich",
+          "details": {
+            "SCIENTIFIC_NAME": "STRUTHIOCAMELUS",
+            "FAMILY": "STRUTHIONIDAE",
+            "LIFESPAN": "40-45 YEARS",
+            "HABITAT": "DESERTS, GRASSLANDS",
+            "HOSTILE": false
+          }
+        },
+            {
+              "name": "Otter",
+              "details": {
+                "SCIENTIFIC_NAME": "LONTRA CANADENSIS",
+                "FAMILY": "MUSTELIDAE",
+                "LIFESPAN": "10-12 YEARS",
+                "HABITAT": "RIVERS, LAKES, COASTLINES",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Owl",
+              "details": {
+                "SCIENTIFIC_NAME": "STRIGIFORMES",
+                "FAMILY": "STRIGIDAE",
+                "LIFESPAN": "5-10 YEARS",
+                "HABITAT": "FORESTS, DESERTS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Panda",
+              "details": {
+                "SCIENTIFIC_NAME": "AILUROPSIS MELANOLEUCA",
+                "FAMILY": "URSIDAE",
+                "LIFESPAN": "20-30 YEARS",
+                "HABITAT": "MOUNTAIN FORESTS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Parrot",
+              "details": {
+                "SCIENTIFIC_NAME": "PSITTACIFORMES",
+                "FAMILY": "PSITTACIDAE",
+                "LIFESPAN": "20-30 YEARS",
+                "HABITAT": "RAINFORESTS, GRASSLANDS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Penguin",
+              "details": {
+                "SCIENTIFIC_NAME": "SPHENISCIDAE",
+                "FAMILY": "SPHENISCIDAE",
+                "LIFESPAN": "15-20 YEARS",
+                "HABITAT": "ANTARCTICA, COASTAL REGIONS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Pig",
+              "details": {
+                "SCIENTIFIC_NAME": "SUS SCROFA DOMESTICUS",
+                "FAMILY": "SUIDAE",
+                "LIFESPAN": "12-20 YEARS",
+                "HABITAT": "FARMS, GRASSLANDS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Polar Bear",
+              "details": {
+                "SCIENTIFIC_NAME": "URSUS MARITIMUS",
+                "FAMILY": "URSIDAE",
+                "LIFESPAN": "20-25 YEARS",
+                "HABITAT": "ARCTIC REGIONS",
+                "HOSTILE": true
+              }
+            },
+            {
+              "name": "Rabbit",
+              "details": {
+                "SCIENTIFIC_NAME": "ORYCTOLAGUS CUNICULUS",
+                "FAMILY": "LEPORIDAE",
+                "LIFESPAN": "9-12 YEARS",
+                "HABITAT": "GRASSLANDS, FORESTS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Raccoon",
+              "details": {
+                "SCIENTIFIC_NAME": "PROCYON LOTOR",
+                "FAMILY": "PROCYONIDAE",
+                "LIFESPAN": "2-3 YEARS",
+                "HABITAT": "FORESTS, URBAN AREAS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Raven",
+              "details": {
+                "SCIENTIFIC_NAME": "CORVUS CORAX",
+                "FAMILY": "CORVIDAE",
+                "LIFESPAN": "10-15 YEARS",
+                "HABITAT": "FORESTS, MOUNTAINS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Red Mullet",
+              "details": {
+                "SCIENTIFIC_NAME": "MULLUS BARBATUS",
+                "FAMILY": "MULLIDAE",
+                "LIFESPAN": "7-10 YEARS",
+                "HABITAT": "SEAS, COASTAL WATERS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Red Sea Bream",
+              "details": {
+                "SCIENTIFIC_NAME": "PAGRUS MAJOR",
+                "FAMILY": "SPARIDAE",
+                "LIFESPAN": "10-15 YEARS",
+                "HABITAT": "COASTAL AREAS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Red Panda",
+              "details": {
+                "SCIENTIFIC_NAME": "AILURUS FULGENS",
+                "FAMILY": "AILURIDAE",
+                "LIFESPAN": "8-10 YEARS",
+                "HABITAT": "MOUNTAIN FORESTS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Rhinoceros",
+              "details": {
+                "SCIENTIFIC_NAME": "RINOCEROTIDAE",
+                "FAMILY": "RINOCEROTIDAE",
+                "LIFESPAN": "40-50 YEARS",
+                "HABITAT": "GRASSLANDS, SAVANNAHS",
+                "HOSTILE": true
+              }
+            },
+            {
+              "name": "Scorpion",
+              "details": {
+                "SCIENTIFIC_NAME": "SCORPIONIDA",
+                "FAMILY": "BUTHIDAE",
+                "LIFESPAN": "2-6 YEARS",
+                "HABITAT": "DESERTS, FORESTS",
+                "HOSTILE": true
+              }
+            },
+            {
+              "name": "Sea Bass",
+              "details": {
+                "SCIENTIFIC_NAME": "DICENTRARCHUS LABRAX",
+                "FAMILY": "SERRANIDAE",
+                "LIFESPAN": "10-15 YEARS",
+                "HABITAT": "COASTAL WATERS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Sea Lion",
+              "details": {
+                "SCIENTIFIC_NAME": "ZALOPHUS CALIFORNIANUS",
+                "FAMILY": "OTARIIDAE",
+                "LIFESPAN": "20-30 YEARS",
+                "HABITAT": "COASTLINES",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Sea Turtle",
+              "details": {
+                "SCIENTIFIC_NAME": "CHELONIIDAE",
+                "FAMILY": "CHELONIIDAE",
+                "LIFESPAN": "50-100 YEARS",
+                "HABITAT": "OCEANS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Seahorse",
+              "details": {
+                "SCIENTIFIC_NAME": "HIPPOCAMPUS",
+                "FAMILY": "SYNGNATHIDAE",
+                "LIFESPAN": "1-5 YEARS",
+                "HABITAT": "CORAL REEFS, SEAGRASS BEDS",
+                "HOSTILE": false
+              }
+            },
+            {
+              "name": "Shark",
+              "details": {
+                "SCIENTIFIC_NAME": "SELACHII",
+                "FAMILY": "CARCHARHINIDAE",
+                "LIFESPAN": "20-30 YEARS",
+                "HABITAT": "OCEANS",
+                "HOSTILE": true
+              }
+            },
+                {
+                  "name": "Sheep",
+                  "details": {
+                    "SCIENTIFIC_NAME": "OVIS ARIES",
+                    "FAMILY": "BOVIDAE",
+                    "LIFESPAN": "10-12 YEARS",
+                    "HABITAT": "GRASSLANDS, FARMS",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Shrimp",
+                  "details": {
+                    "SCIENTIFIC_NAME": "DECAPODA",
+                    "FAMILY": "PENAEIDAE",
+                    "LIFESPAN": "1-2 YEARS",
+                    "HABITAT": "SEAWATER, FRESHWATER",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Snail",
+                  "details": {
+                    "SCIENTIFIC_NAME": "GASTROPODA",
+                    "FAMILY": "MELANIDAE",
+                    "LIFESPAN": "2-5 YEARS",
+                    "HABITAT": "GARDENS, FORESTS, WATERWAYS",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Snake",
+                  "details": {
+                    "SCIENTIFIC_NAME": "SERPENTES",
+                    "FAMILY": "COLUBRIDAE",
+                    "LIFESPAN": "5-20 YEARS",
+                    "HABITAT": "DESERTS, FORESTS, GRASSLANDS",
+                    "HOSTILE": true
+                  }
+                },
+                {
+                  "name": "Sparrow",
+                  "details": {
+                    "SCIENTIFIC_NAME": "PASSER DOMESTICUS",
+                    "FAMILY": "PASSERIDAE",
+                    "LIFESPAN": "3-5 YEARS",
+                    "HABITAT": "CITIES, FARMLANDS",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Spider",
+                  "details": {
+                    "SCIENTIFIC_NAME": "ARANEAE",
+                    "FAMILY": "ARANEIDAE",
+                    "LIFESPAN": "1-3 YEARS",
+                    "HABITAT": "FORESTS, HOUSES",
+                    "HOSTILE": true
+                  }
+                },
+                {
+                  "name": "Squid",
+                  "details": {
+                    "SCIENTIFIC_NAME": "TEUTHIDA",
+                    "FAMILY": "LOLIGINIDAE",
+                    "LIFESPAN": "1-2 YEARS",
+                    "HABITAT": "OCEANS",
+                    "HOSTILE": true
+                  }
+                },
+                {
+                  "name": "Squirrel",
+                  "details": {
+                    "SCIENTIFIC_NAME": "SCIURUS CAROLINENSIS",
+                    "FAMILY": "SCIURIDAE",
+                    "LIFESPAN": "6-12 YEARS",
+                    "HABITAT": "FORESTS, URBAN AREAS",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Starfish",
+                  "details": {
+                    "SCIENTIFIC_NAME": "ASTEROIDEA",
+                    "FAMILY": "ASTERIIDAE",
+                    "LIFESPAN": "20-35 YEARS",
+                    "HABITAT": "CORAL REEFS, SEASHORES",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Striped Red Mullet",
+                  "details": {
+                    "SCIENTIFIC_NAME": "MULLUS SURMULETUS",
+                    "FAMILY": "MULLIDAE",
+                    "LIFESPAN": "7-10 YEARS",
+                    "HABITAT": "SEAWATER",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Swan",
+                  "details": {
+                    "SCIENTIFIC_NAME": "CYGNUS",
+                    "FAMILY": "ANATIDAE",
+                    "LIFESPAN": "10-20 YEARS",
+                    "HABITAT": "LAKES, RIVERS",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Tick",
+                  "details": {
+                    "SCIENTIFIC_NAME": "IXODIDA",
+                    "FAMILY": "IXODIDAE",
+                    "LIFESPAN": "2 YEARS",
+                    "HABITAT": "FORESTS, GRASSLANDS",
+                    "HOSTILE": true
+                  }
+                },
+                {
+                  "name": "Tiger",
+                  "details": {
+                    "SCIENTIFIC_NAME": "PANTHERA TIGRIS",
+                    "FAMILY": "FELIDAE",
+                    "LIFESPAN": "10-15 YEARS",
+                    "HABITAT": "RAINFORESTS, GRASSLANDS",
+                    "HOSTILE": true
+                  }
+                },
+                {
+                  "name": "Tortoise",
+                  "details": {
+                    "SCIENTIFIC_NAME": "TESTUDINIDAE",
+                    "FAMILY": "TESTUDINIDAE",
+                    "LIFESPAN": "50-100 YEARS",
+                    "HABITAT": "GRASSLANDS, DESERTS",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Trout",
+                  "details": {
+                    "SCIENTIFIC_NAME": "SALMO TRUTTA",
+                    "FAMILY": "SALMONIDAE",
+                    "LIFESPAN": "4-6 YEARS",
+                    "HABITAT": "RIVERS, LAKES",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Turkey",
+                  "details": {
+                    "SCIENTIFIC_NAME": "MELEAGRIS GALLOPAVO",
+                    "FAMILY": "PHASIANDIDAE",
+                    "LIFESPAN": "10-15 YEARS",
+                    "HABITAT": "FORESTS, FARMS",
+                    "HOSTILE": false
+                  }
+                },
+                {
+                  "name": "Turtle",
+                  "details": {
+                    "SCIENTIFIC_NAME": "TESTUDINES",
+                    "FAMILY": "TESTUDINIDAE",
+                    "LIFESPAN": "50-100 YEARS",
+                    "HABITAT": "OCEANS, FRESHWATER",
+                    "HOSTILE": false
+                  }
+                },
+                    {
+                      "name": "Whale",
+                      "details": {
+                        "SCIENTIFIC_NAME": "CETACEA",
+                        "FAMILY": "BALENIDAE",
+                        "LIFESPAN": "30-70 YEARS",
+                        "HABITAT": "OCEANS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Woodpecker",
+                      "details": {
+                        "SCIENTIFIC_NAME": "PICIDAE",
+                        "FAMILY": "PICIDAE",
+                        "LIFESPAN": "5-9 YEARS",
+                        "HABITAT": "FORESTS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Worm",
+                      "details": {
+                        "SCIENTIFIC_NAME": "LUMBRICUS TERRESTRIS",
+                        "FAMILY": "LUMBRICIDAE",
+                        "LIFESPAN": "1-6 YEARS",
+                        "HABITAT": "SOIL",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Zebra",
+                      "details": {
+                        "SCIENTIFIC_NAME": "EQUUS QUAGGA",
+                        "FAMILY": "EQUIDAE",
+                        "LIFESPAN": "20-30 YEARS",
+                        "HABITAT": "SAVANNAHS, GRASSLANDS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Antelope",
+                      "details": {
+                        "SCIENTIFIC_NAME": "BOVIDAE",
+                        "FAMILY": "BOVIDAE",
+                        "LIFESPAN": "10-20 YEARS",
+                        "HABITAT": "GRASSLANDS, SAVANNAHS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Badger",
+                      "details": {
+                        "SCIENTIFIC_NAME": "MELES MELES",
+                        "FAMILY": "MELIDAE",
+                        "LIFESPAN": "14-15 YEARS",
+                        "HABITAT": "WOODLANDS, FARMLANDS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Bat",
+                      "details": {
+                        "SCIENTIFIC_NAME": "CHIROPTERA",
+                        "FAMILY": "VESPERTILIONIDAE",
+                        "LIFESPAN": "5-10 YEARS",
+                        "HABITAT": "CAVES, BUILDINGS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Bee",
+                      "details": {
+                        "SCIENTIFIC_NAME": "APIS MELLIFERA",
+                        "FAMILY": "APIDAE",
+                        "LIFESPAN": "1-2 MONTHS",
+                        "HABITAT": "FLOWERS, NESTS",
+                        "HOSTILE": true
+                      }
+                    },
+                    {
+                      "name": "Beetle",
+                      "details": {
+                        "SCIENTIFIC_NAME": "COLEOPTERA",
+                        "FAMILY": "COLEOPTERIDAE",
+                        "LIFESPAN": "1-3 YEARS",
+                        "HABITAT": "SOIL, WOOD, PLANTS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Bison",
+                      "details": {
+                        "SCIENTIFIC_NAME": "BISON BISON",
+                        "FAMILY": "BOVIDAE",
+                        "LIFESPAN": "15-20 YEARS",
+                        "HABITAT": "GRASSLANDS, PLAINS",
+                        "HOSTILE": true
+                      }
+                    },
+                    {
+                      "name": "Boar",
+                      "details": {
+                        "SCIENTIFIC_NAME": "SUS SCROFA",
+                        "FAMILY": "SUIDAE",
+                        "LIFESPAN": "10-15 YEARS",
+                        "HABITAT": "FORESTS, GRASSLANDS",
+                        "HOSTILE": true
+                      }
+                    },
+                    {
+                      "name": "Cane",
+                      "details": {
+                        "SCIENTIFIC_NAME": "SACCHARUM OFFICINARUM",
+                        "FAMILY": "POACEAE",
+                        "LIFESPAN": "5-10 YEARS",
+                        "HABITAT": "TROPICAL REGIONS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Cat",
+                      "details": {
+                        "SCIENTIFIC_NAME": "FELIS CATUS",
+                        "FAMILY": "FELIDAE",
+                        "LIFESPAN": "15-20 YEARS",
+                        "HABITAT": "HOMES, FARMS",
+                        "HOSTILE": false
+                      }
+                    },
+                    {
+                      "name": "Cavallo",
+                      "details": {
+                        "SCIENTIFIC_NAME": "EQUUS FERUS CABALLUS",
+                        "FAMILY": "EQUIDAE",
+                        "LIFESPAN": "25-30 YEARS",
+                        "HABITAT": "GRASSLANDS, FARMS",
+                        "HOSTILE": false
+                      }
+                    },
+                        {
+                          "name": "Chimpanzee",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PAN TROGLODYTES",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "33-38 YEARS",
+                            "HABITAT": "RAINFORESTS, WOODED AREAS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Cockroach",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BLATTARIA",
+                            "FAMILY": "BLATTIDAE",
+                            "LIFESPAN": "1-2 YEARS",
+                            "HABITAT": "HOUSES, GARBAGE AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cow",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Coyote",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS LATRANS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-14 YEARS",
+                            "HABITAT": "DESERTS, FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Crow",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CORVUS BRACHYRYNCHOS",
+                            "FAMILY": "CORVIDAE",
+                            "LIFESPAN": "7-8 YEARS",
+                            "HABITAT": "CITIES, FARMLANDS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dog",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS LUPUS FAMILIARIS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-15 YEARS",
+                            "HABITAT": "HOMES, FARMS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dolphin",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DELFINIDAE",
+                            "FAMILY": "DELFINIDAE",
+                            "LIFESPAN": "20-60 YEARS",
+                            "HABITAT": "OCEANS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Donkey",
+                          "details": {
+                            "SCIENTIFIC_NAME": "EQUUS ASINUS",
+                            "FAMILY": "EQUIDAE",
+                            "LIFESPAN": "25-30 YEARS",
+                            "HABITAT": "FARMS, DESERTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dragonfly",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ODONATA",
+                            "FAMILY": "LIBELLULIDAE",
+                            "LIFESPAN": "6 MONTHS",
+                            "HABITAT": "PONDS, SWAMPS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Elefante",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ELEPHAS MAXIMUS",
+                            "FAMILY": "ELEPHANTIDAE",
+                            "LIFESPAN": "60-70 YEARS",
+                            "HABITAT": "FORESTS, SAVANNAHS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Farfalla",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPIDOPTERA",
+                            "FAMILY": "NYMPHALIDAE",
+                            "LIFESPAN": "2-3 WEEKS",
+                            "HABITAT": "GARDENS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Flamingo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PHOENICOPTERUS ROSEUS",
+                            "FAMILY": "PHOENICOPTERIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "SALINE LAKES, COASTAL FLATS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Fly",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DIPTERA",
+                            "FAMILY": "MUSCIDAE",
+                            "LIFESPAN": "2-4 WEEKS",
+                            "HABITAT": "HOUSES, GARBAGE AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gallina",
+                          "details": {
+                            "SCIENTIFIC_NAME": "GALLUS GALLUS DOMESTICUS",
+                            "FAMILY": "PHASIANDIDAE",
+                            "LIFESPAN": "5-10 YEARS",
+                            "HABITAT": "FARMS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gatto",
+                          "details": {
+                            "SCIENTIFIC_NAME": "FELIS CATUS",
+                            "FAMILY": "FELIDAE",
+                            "LIFESPAN": "12-16 YEARS",
+                            "HABITAT": "HOMES, FARMS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gorilla",
+                          "details": {
+                            "SCIENTIFIC_NAME": "GORILLA GORILLA",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "35-40 YEARS",
+                            "HABITAT": "RAINFORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Grasshopper",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CAELIFERA",
+                            "FAMILY": "ACRIDIDAE",
+                            "LIFESPAN": "2-3 MONTHS",
+                            "HABITAT": "GRASSLANDS, MEADOWS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hare",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPUS EUROPAEUS",
+                            "FAMILY": "LEPORIDAE",
+                            "LIFESPAN": "3-5 YEARS",
+                            "HABITAT": "GRASSLANDS, WOODED AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hornbill",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BUCEROOTIDAE",
+                            "FAMILY": "BUCEROOTIDAE",
+                            "LIFESPAN": "30-50 YEARS",
+                            "HABITAT": "TROPICAL AND SUBTROPICAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hummingbird",
+                          "details": {
+                            "SCIENTIFIC_NAME": "TROCHILIDAE",
+                            "FAMILY": "TROCHILIDAE",
+                            "LIFESPAN": "3-5 YEARS",
+                            "HABITAT": "TROPICAL AND SUBTROPICAL REGIONS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hyena",
+                          "details": {
+                            "SCIENTIFIC_NAME": "HYAENIDAE",
+                            "FAMILY": "HYAENIDAE",
+                            "LIFESPAN": "10-12 YEARS",
+                            "HABITAT": "SAVANNAHS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Ladybugs",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COVIETTIDAE",
+                            "FAMILY": "COLEOPTERIDAE",
+                            "LIFESPAN": "1 YEAR",
+                            "HABITAT": "GARDENS, FIELDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Lobster",
+                          "details": {
+                            "SCIENTIFIC_NAME": "NEPHROPIDAE",
+                            "FAMILY": "NEPHROPIDAE",
+                            "LIFESPAN": "50-100 YEARS",
+                            "HABITAT": "OCEAN, SEABEDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Mosquito",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CULICIDAE",
+                            "FAMILY": "CULICIDAE",
+                            "LIFESPAN": "2-4 WEEKS",
+                            "HABITAT": "STAGNANT WATER, WETLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Moth",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPIDOPTERA",
+                            "FAMILY": "NOCTUIDAE",
+                            "LIFESPAN": "1-2 WEEKS",
+                            "HABITAT": "GARDENS, WOODS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Mucca",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Octopus",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OCTOPODIDAE",
+                            "FAMILY": "OCTOPODIDAE",
+                            "LIFESPAN": "3-5 YEARS",
+                            "HABITAT": "OCEAN, CORAL REEFS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Okapi",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OKAPIA JOHNSTONIAE",
+                            "FAMILY": "GIRAFFIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "TROPICAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Orangutan",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PONGO PYGMAEUS",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "30-40 YEARS",
+                            "HABITAT": "RAINFORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Ox",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "15-20 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Oyster",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OSTREIDAE",
+                            "FAMILY": "OSTREIDAE",
+                            "LIFESPAN": "20 YEARS",
+                            "HABITAT": "MARINE ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pecora",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOVIDAE",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "10-12 YEARS",
+                            "HABITAT": "FARMS, MOUNTAINOUS AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pelecaniformes",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PELECANIFORMES",
+                            "FAMILY": "PELECANIDAE",
+                            "LIFESPAN": "15-25 YEARS",
+                            "HABITAT": "COASTAL AREAS, LAKES",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pigeon",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COLUMBA LIVIA",
+                            "FAMILY": "COLUMBIDAE",
+                            "LIFESPAN": "3-6 YEARS",
+                            "HABITAT": "URBAN AREAS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Porcupine",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ERETHIZONTIDAE",
+                            "FAMILY": "ERETHIZONTIDAE",
+                            "LIFESPAN": "5-10 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Possum",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DIDELPHIMORPHIA",
+                            "FAMILY": "DIDELPHIDAE",
+                            "LIFESPAN": "2-4 YEARS",
+                            "HABITAT": "FORESTS, URBAN AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Ragno",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ARANEAE",
+                            "FAMILY": "ARANEIDAE",
+                            "LIFESPAN": "1-2 YEARS",
+                            "HABITAT": "FORESTS, HOUSES",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Rat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "RATTUS",
+                            "FAMILY": "MURIDAE",
+                            "LIFESPAN": "1-3 YEARS",
+                            "HABITAT": "URBAN AREAS, SEWERS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Reindeer",
+                          "details": {
+                            "SCIENTIFIC_NAME": "RANGIFER TARANDUS",
+                            "FAMILY": "CERVIDAE",
+                            "LIFESPAN": "15-18 YEARS",
+                            "HABITAT": "TUNDRA, BOREAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Sandpiper",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SCOLOPACIDAE",
+                            "FAMILY": "SCOLOPACIDAE",
+                            "LIFESPAN": "10-12 YEARS",
+                            "HABITAT": "COASTAL AREAS, WETLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Scoiattolo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SCIURIDAE",
+                            "FAMILY": "SCIURIDAE",
+                            "LIFESPAN": "5-10 YEARS",
+                            "HABITAT": "FORESTS, URBAN AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Seal",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PHOCIDAE",
+                            "FAMILY": "PHOCIDAE",
+                            "LIFESPAN": "25-30 YEARS",
+                            "HABITAT": "OCEANS, ARCTIC REGIONS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Wolf",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS LUPUS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "6-8 YEARS",
+                            "HABITAT": "FORESTS, TUNDRA, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Wombat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "VOMBATUS URSINUS",
+                            "FAMILY": "VOMBATIDAE",
+                            "LIFESPAN": "15-20 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Antelope",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOVIDAE",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "10-25 YEARS",
+                            "HABITAT": "SAVANNAHS, GRASSLANDS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Badger",
+                          "details": {
+                            "SCIENTIFIC_NAME": "MELINAE",
+                            "FAMILY": "MUSTELIDAE",
+                            "LIFESPAN": "5-14 YEARS",
+                            "HABITAT": "WOODED AREAS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Bat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CHIROPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "5-30 YEARS",
+                            "HABITAT": "CAVES, FORESTS, URBAN AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Bee",
+                          "details": {
+                            "SCIENTIFIC_NAME": "APIS",
+                            "FAMILY": "APIDAE",
+                            "LIFESPAN": "6 WEEKS - 5 YEARS (QUEEN)",
+                            "HABITAT": "GARDENS, MEADOWS, FORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Beetle",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COLEOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "30 DAYS - 1 YEAR",
+                            "HABITAT": "FORESTS, FIELDS, GARDENS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Bison",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BISON BISON",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "15-20 YEARS",
+                            "HABITAT": "GRASSLANDS, PRAIRIES",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Boar",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SUS SCROFA",
+                            "FAMILY": "SUIDAE",
+                            "LIFESPAN": "10-14 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Cane",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-13 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "FELIS CATUS",
+                            "FAMILY": "FELIDAE",
+                            "LIFESPAN": "12-16 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cavallo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "EQUUS FERUS CABALLUS",
+                            "FAMILY": "EQUIDAE",
+                            "LIFESPAN": "25-30 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Chimpanzee",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PAN TROGLODYTES",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "30-50 YEARS",
+                            "HABITAT": "TROPICAL FORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Cockroach",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BLATTARIA",
+                            "FAMILY": "BLATTIDAE",
+                            "LIFESPAN": "20-30 WEEKS",
+                            "HABITAT": "URBAN AREAS, HOUSES",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cow",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Coyote",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS LATRANS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-14 YEARS",
+                            "HABITAT": "GRASSLANDS, DESERTS, FORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Crow",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CORVUS",
+                            "FAMILY": "CORVIDAE",
+                            "LIFESPAN": "7-14 YEARS",
+                            "HABITAT": "URBAN AREAS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dog",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS FAMILIARIS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-13 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dolphin",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DELPHINIDAE",
+                            "FAMILY": "DELPHINIDAE",
+                            "LIFESPAN": "20-50 YEARS",
+                            "HABITAT": "OCEANS, SEAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Donkey",
+                          "details": {
+                            "SCIENTIFIC_NAME": "EQUUS ASINUS",
+                            "FAMILY": "EQUIDAE",
+                            "LIFESPAN": "25-30 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dragonfly",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ANISOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "6 MONTHS",
+                            "HABITAT": "LAKES, PONDS, WETLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Elefante",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LOXODONTA AFRICANA",
+                            "FAMILY": "ELEPHANTIDAE",
+                            "LIFESPAN": "60-70 YEARS",
+                            "HABITAT": "SAVANNAHS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Farfalla",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPIDOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-2 WEEKS",
+                            "HABITAT": "GARDENS, FORESTS, MEADOWS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Flamingo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PHOENICOPTERUS",
+                            "FAMILY": "PHOENICOPTERIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "LAKES, LAGOONS, WETLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Fly",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DIPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "28 DAYS",
+                            "HABITAT": "URBAN AREAS, FORESTS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gallina",
+                          "details": {
+                            "SCIENTIFIC_NAME": "GALLUS GALLUS DOMESTICUS",
+                            "FAMILY": "PHASIANIDAE",
+                            "LIFESPAN": "5-10 YEARS",
+                            "HABITAT": "FARMS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gatto",
+                          "details": {
+                            "SCIENTIFIC_NAME": "FELIS CATUS",
+                            "FAMILY": "FELIDAE",
+                            "LIFESPAN": "12-16 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gorilla",
+                          "details": {
+                            "SCIENTIFIC_NAME": "GORILLA GORILLA",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "35-40 YEARS",
+                            "HABITAT": "TROPICAL FORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Grasshopper",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CAELIFERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1 YEAR",
+                            "HABITAT": "FIELDS, MEADOWS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hare",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPUS",
+                            "FAMILY": "LEPORIDAE",
+                            "LIFESPAN": "4-7 YEARS",
+                            "HABITAT": "MEADOWS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hornbill",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BUCEROTIDAE",
+                            "FAMILY": "BUCEROTIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "TROPICAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hummingbird",
+                          "details": {
+                            "SCIENTIFIC_NAME": "TROCHILIDAE",
+                            "FAMILY": "TROCHILIDAE",
+                            "LIFESPAN": "3-5 YEARS",
+                            "HABITAT": "FORESTS, MEADOWS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hyena",
+                          "details": {
+                            "SCIENTIFIC_NAME": "HYAENIDAE",
+                            "FAMILY": "HYAENIDAE",
+                            "LIFESPAN": "12-25 YEARS",
+                            "HABITAT": "SAVANNAHS, GRASSLANDS, DESERTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Ladybugs",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COCCINELLIDAE",
+                            "FAMILY": "COCCINELLIDAE",
+                            "LIFESPAN": "1 YEAR",
+                            "HABITAT": "GARDENS, FORESTS, FIELDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Lobster",
+                          "details": {
+                            "SCIENTIFIC_NAME": "NEPHROPIDAE",
+                            "FAMILY": "NEPHROPIDAE",
+                            "LIFESPAN": "50-100 YEARS",
+                            "HABITAT": "OCEAN FLOORS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Mosquito",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CULICIDAE",
+                            "FAMILY": "CULICIDAE",
+                            "LIFESPAN": "7-10 DAYS",
+                            "HABITAT": "WETLANDS, TROPICAL AREAS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Moth",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPIDOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-4 WEEKS",
+                            "HABITAT": "FORESTS, MEADOWS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Mucca",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Octopus",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OCTOPODA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-5 YEARS",
+                            "HABITAT": "OCEANS, SEAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Okapi",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OKAPIA JOHNSTONI",
+                            "FAMILY": "GIRAFFIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "TROPICAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Orangutan",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PONGO",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "30-40 YEARS",
+                            "HABITAT": "TROPICAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Ox",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Oyster",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OSTREIDAE",
+                            "FAMILY": "OSTREIDAE",
+                            "LIFESPAN": "20 YEARS",
+                            "HABITAT": "OCEAN FLOORS, COASTAL WATERS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pecora",
+                          "details": {
+                            "SCIENTIFIC_NAME": "RUMINANTIA",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "10-20 YEARS",
+                            "HABITAT": "GRASSLANDS, WOODED AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pelecaniformes",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PELECANIFORMES",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "10-30 YEARS",
+                            "HABITAT": "COASTAL AREAS, WETLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pigeon",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COLUMBA LIVIA",
+                            "FAMILY": "COLUMBIDAE",
+                            "LIFESPAN": "3-6 YEARS",
+                            "HABITAT": "URBAN AREAS, WOODED REGIONS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Porcupine",
+                          "details": {
+                            "SCIENTIFIC_NAME": "HYSTRICIDAE",
+                            "FAMILY": "HYSTRICIDAE",
+                            "LIFESPAN": "5-7 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Possum",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DIDELPHIMORPHIA",
+                            "FAMILY": "DIDELPHIDAE",
+                            "LIFESPAN": "2-4 YEARS",
+                            "HABITAT": "FORESTS, WOODED AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Ragno",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ARANEAE",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-2 YEARS",
+                            "HABITAT": "VARIOUS, INCLUDING FORESTS, DESERTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Rat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "RATTUS",
+                            "FAMILY": "MURIDAE",
+                            "LIFESPAN": "1-3 YEARS",
+                            "HABITAT": "URBAN AREAS, WOODED REGIONS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Reindeer",
+                          "details": {
+                            "SCIENTIFIC_NAME": "RANGIFER TARANDUS",
+                            "FAMILY": "CERVIDAE",
+                            "LIFESPAN": "15-20 YEARS",
+                            "HABITAT": "ARCTIC AND SUBARCTIC REGIONS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Sandpiper",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SCOLOPACIDAE",
+                            "FAMILY": "SCOLOPACIDAE",
+                            "LIFESPAN": "8-10 YEARS",
+                            "HABITAT": "COASTAL AREAS, WETLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Scoiattolo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SCIURUS",
+                            "FAMILY": "SCIURIDAE",
+                            "LIFESPAN": "6-12 YEARS",
+                            "HABITAT": "FORESTS, URBAN AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Seal",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PHOCIDAE",
+                            "FAMILY": "PHOCIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "COASTAL WATERS, ARCTIC REGIONS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Wolf",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS LUPUS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "8-13 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS, ARCTIC REGIONS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Wombat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "VOMBATUS URSINUS",
+                            "FAMILY": "VOMBATIDAE",
+                            "LIFESPAN": "15-20 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Antelope",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOVIDAE",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "10-20 YEARS",
+                            "HABITAT": "SAVANNAHS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Badger",
+                          "details": {
+                            "SCIENTIFIC_NAME": "MELINAE",
+                            "FAMILY": "MUSTELIDAE",
+                            "LIFESPAN": "10-15 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Bat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CHIROPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "10-30 YEARS",
+                            "HABITAT": "CAVES, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Bee",
+                          "details": {
+                            "SCIENTIFIC_NAME": "APIS",
+                            "FAMILY": "APIDAE",
+                            "LIFESPAN": "2-5 WEEKS (WORKER BEES)",
+                            "HABITAT": "HIVES, FORESTS, FIELDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Beetle",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COLEOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "30 DAYS TO SEVERAL YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Bison",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BISON BISON",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "15-20 YEARS",
+                            "HABITAT": "GRASSLANDS, PRAIRIES",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Boar",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SUS SCROFA",
+                            "FAMILY": "SUIDAE",
+                            "LIFESPAN": "10-14 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Cane",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-14 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "FELIS CATUS",
+                            "FAMILY": "FELIDAE",
+                            "LIFESPAN": "12-16 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cavallo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "EQUUS FERUS CABALLUS",
+                            "FAMILY": "EQUIDAE",
+                            "LIFESPAN": "25-30 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Chimpanzee",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PAN TROGLODYTES",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "40-50 YEARS",
+                            "HABITAT": "TROPICAL FORESTS, WOODLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Cockroach",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BLATTODEA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1 YEAR",
+                            "HABITAT": "URBAN AREAS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cow",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Coyote",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS LATRANS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-14 YEARS",
+                            "HABITAT": "GRASSLANDS, DESERTS, FORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Crow",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CORVUS",
+                            "FAMILY": "CORVIDAE",
+                            "LIFESPAN": "7-8 YEARS",
+                            "HABITAT": "URBAN AREAS, FORESTS, FIELDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dog",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS FAMILIARIS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "10-13 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dolphin",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DELPHINIDAE",
+                            "FAMILY": "DELPHINIDAE",
+                            "LIFESPAN": "30-50 YEARS",
+                            "HABITAT": "OCEANS, SEAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Donkey",
+                          "details": {
+                            "SCIENTIFIC_NAME": "EQUUS AFRICANUS ASINUS",
+                            "FAMILY": "EQUIDAE",
+                            "LIFESPAN": "25-30 YEARS",
+                            "HABITAT": "FARMS, DESERTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Dragonfly",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ANISOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "7-56 DAYS",
+                            "HABITAT": "WETLANDS, PONDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Elefante",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LOXODONTA",
+                            "FAMILY": "ELEPHANTIDAE",
+                            "LIFESPAN": "60-70 YEARS",
+                            "HABITAT": "SAVANNAHS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Farfalla",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPIDOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-2 WEEKS (SOME LONGER)",
+                            "HABITAT": "FORESTS, MEADOWS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Flamingo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PHOENICOPTERUS",
+                            "FAMILY": "PHOENICOPTERIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "LAGOONS, MUDFLATS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Fly",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DIPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "28 DAYS",
+                            "HABITAT": "VARIOUS, INCLUDING URBAN AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gallina",
+                          "details": {
+                            "SCIENTIFIC_NAME": "GALLUS GALLUS DOMESTICUS",
+                            "FAMILY": "PHASIANIDAE",
+                            "LIFESPAN": "5-10 YEARS",
+                            "HABITAT": "FARMS, WOODED AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gatto",
+                          "details": {
+                            "SCIENTIFIC_NAME": "FELIS CATUS",
+                            "FAMILY": "FELIDAE",
+                            "LIFESPAN": "12-16 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Gorilla",
+                          "details": {
+                            "SCIENTIFIC_NAME": "GORILLA",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "35-40 YEARS",
+                            "HABITAT": "TROPICAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Grasshopper",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CAELIFERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1 YEAR",
+                            "HABITAT": "GRASSLANDS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hare",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPUS",
+                            "FAMILY": "LEPORIDAE",
+                            "LIFESPAN": "4-7 YEARS",
+                            "HABITAT": "GRASSLANDS, WOODED AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hornbill",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BUCEROTIDAE",
+                            "FAMILY": "BUCEROTIDAE",
+                            "LIFESPAN": "20-40 YEARS",
+                            "HABITAT": "TROPICAL AND SUBTROPICAL FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hummingbird",
+                          "details": {
+                            "SCIENTIFIC_NAME": "TROCHILIDAE",
+                            "FAMILY": "TROCHILIDAE",
+                            "LIFESPAN": "3-5 YEARS",
+                            "HABITAT": "FORESTS, MEADOWS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Hyena",
+                          "details": {
+                            "SCIENTIFIC_NAME": "HYAENIDAE",
+                            "FAMILY": "HYAENIDAE",
+                            "LIFESPAN": "10-12 YEARS (IN THE WILD)",
+                            "HABITAT": "GRASSLANDS, SAVANNAS, FORESTS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Ladybugs",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COCCINELLIDAE",
+                            "FAMILY": "COCCINELLIDAE",
+                            "LIFESPAN": "1 YEAR",
+                            "HABITAT": "GARDENS, FIELDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Lobster",
+                          "details": {
+                            "SCIENTIFIC_NAME": "NEPHROPIDAE",
+                            "FAMILY": "NEPHROPIDAE",
+                            "LIFESPAN": "20-50 YEARS",
+                            "HABITAT": "OCEANS, SEA BEDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Mosquito",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CULICIDAE",
+                            "FAMILY": "CULICIDAE",
+                            "LIFESPAN": "2 WEEKS TO 2 MONTHS",
+                            "HABITAT": "WETLANDS, URBAN AREAS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Moth",
+                          "details": {
+                            "SCIENTIFIC_NAME": "LEPIDOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1 WEEK TO A FEW MONTHS",
+                            "HABITAT": "FORESTS, GARDENS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Mucca",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Octopus",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OCTOPODA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-5 YEARS",
+                            "HABITAT": "OCEANS, SEA BEDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Okapi",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OKAPIA JOHNSTONI",
+                            "FAMILY": "GIRAFFIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "RAINFORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Orangutan",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PONGO",
+                            "FAMILY": "HOMINIDAE",
+                            "LIFESPAN": "30-40 YEARS",
+                            "HABITAT": "TROPICAL RAINFORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Ox",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOS TAURUS",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "18-22 YEARS",
+                            "HABITAT": "FARMS, GRASSLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Oyster",
+                          "details": {
+                            "SCIENTIFIC_NAME": "OSTREIDAE",
+                            "FAMILY": "OSTREIDAE",
+                            "LIFESPAN": "20 YEARS",
+                            "HABITAT": "OCEANS, COASTAL WATERS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pecora",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BOVIDAE",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "10-12 YEARS",
+                            "HABITAT": "GRASSLANDS, FARMS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pelecaniformes",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PELECANIFORMES",
+                            "FAMILY": "PELECANIDAE",
+                            "LIFESPAN": "10-30 YEARS",
+                            "HABITAT": "COASTAL AREAS, WETLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Pigeon",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COLUMBA LIVIA",
+                            "FAMILY": "COLUMBIDAE",
+                            "LIFESPAN": "6-10 YEARS",
+                            "HABITAT": "URBAN AREAS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Porcupine",
+                          "details": {
+                            "SCIENTIFIC_NAME": "HYSTRICIDAE",
+                            "FAMILY": "HYSTRICIDAE",
+                            "LIFESPAN": "5-7 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Possum",
+                          "details": {
+                            "SCIENTIFIC_NAME": "DIDELPHIMORPHIA",
+                            "FAMILY": "DIDELPHIDAE",
+                            "LIFESPAN": "2-4 YEARS",
+                            "HABITAT": "FORESTS, URBAN AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Ragno",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ARANEAE",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-2 YEARS",
+                            "HABITAT": "FORESTS, URBAN AREAS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Rat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "RATTUS",
+                            "FAMILY": "MURIDAE",
+                            "LIFESPAN": "1-3 YEARS",
+                            "HABITAT": "URBAN AREAS, FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Reindeer",
+                          "details": {
+                            "SCIENTIFIC_NAME": "RANGIFER TARANDUS",
+                            "FAMILY": "CERVIDAE",
+                            "LIFESPAN": "15-20 YEARS",
+                            "HABITAT": "ARCTIC AND SUBARCTIC REGIONS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Sandpiper",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SCOLOPACIDAE",
+                            "FAMILY": "SCOLOPACIDAE",
+                            "LIFESPAN": "10-15 YEARS",
+                            "HABITAT": "COASTAL AREAS, WETLANDS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Scoiattolo",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SCIURUS",
+                            "FAMILY": "SCIURIDAE",
+                            "LIFESPAN": "6-12 YEARS",
+                            "HABITAT": "FORESTS, PARKS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Seal",
+                          "details": {
+                            "SCIENTIFIC_NAME": "PHOCIDAE",
+                            "FAMILY": "PHOCIDAE",
+                            "LIFESPAN": "20-30 YEARS",
+                            "HABITAT": "COASTAL AREAS, OCEANS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Wolf",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS LUPUS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "6-8 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Wombat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "VOMBATIDAE",
+                            "FAMILY": "VOMBATIDAE",
+                            "LIFESPAN": "5-15 YEARS",
+                            "HABITAT": "EUCALYPTUS FORESTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Zebra",
+                          "details": {
+                            "SCIENTIFIC_NAME": "EQUUS QUAGGA",
+                            "FAMILY": "EQUIDAE",
+                            "LIFESPAN": "20-25 YEARS",
+                            "HABITAT": "GRASSLANDS, SAVANNAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Antelope",
+                          "details": {
+                            "SCIENTIFIC_NAME": "ANTILOCAPRIDAE",
+                            "FAMILY": "ANTILOCAPRIDAE",
+                            "LIFESPAN": "10-20 YEARS",
+                            "HABITAT": "GRASSLANDS, SAVANNAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Badger",
+                          "details": {
+                            "SCIENTIFIC_NAME": "MELINA MELINA",
+                            "FAMILY": "MUSTELIDAE",
+                            "LIFESPAN": "14-16 YEARS",
+                            "HABITAT": "FORESTS, FARMLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Bat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CHIROPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "5-30 YEARS",
+                            "HABITAT": "CAVES, WOODED AREAS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Bee",
+                          "details": {
+                            "SCIENTIFIC_NAME": "APIS",
+                            "FAMILY": "APIDAE",
+                            "LIFESPAN": "5-6 WEEKS (WORKER)",
+                            "HABITAT": "HIVES, FLOWERS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Beetle",
+                          "details": {
+                            "SCIENTIFIC_NAME": "COLEOPTERA",
+                            "FAMILY": "VARIOUS",
+                            "LIFESPAN": "1-3 YEARS",
+                            "HABITAT": "FORESTS, GARDENS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Bison",
+                          "details": {
+                            "SCIENTIFIC_NAME": "BISON BISON",
+                            "FAMILY": "BOVIDAE",
+                            "LIFESPAN": "10-20 YEARS",
+                            "HABITAT": "GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Boar",
+                          "details": {
+                            "SCIENTIFIC_NAME": "SUS SCROFA",
+                            "FAMILY": "SUIDAE",
+                            "LIFESPAN": "10-14 YEARS",
+                            "HABITAT": "FORESTS, GRASSLANDS",
+                            "HOSTILE": true
+                          }
+                        },
+                        {
+                          "name": "Cane",
+                          "details": {
+                            "SCIENTIFIC_NAME": "CANIS",
+                            "FAMILY": "CANIDAE",
+                            "LIFESPAN": "12-15 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        },
+                        {
+                          "name": "Cat",
+                          "details": {
+                            "SCIENTIFIC_NAME": "FELIS CATUS",
+                            "FAMILY": "FELIDAE",
+                            "LIFESPAN": "12-16 YEARS",
+                            "HABITAT": "DOMESTIC ENVIRONMENTS",
+                            "HOSTILE": false
+                          }
+                        }
+                      ]
+                    }
+    
