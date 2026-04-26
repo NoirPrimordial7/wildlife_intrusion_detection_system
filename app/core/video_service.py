@@ -28,6 +28,13 @@ DETECTION_INTERVALS: dict[str, tuple[str, float]] = {
 }
 
 
+def format_video_timestamp(seconds: float) -> str:
+    seconds = max(0.0, float(seconds))
+    minutes = int(seconds // 60)
+    remainder = seconds - (minutes * 60)
+    return f"{minutes:02d}:{remainder:05.2f}"
+
+
 class VideoService:
     def __init__(
         self,
@@ -57,6 +64,8 @@ class VideoService:
         self._running = False
         self._seek_frame: int | None = None
         self._last_prediction_second = -9999.0
+        self._last_frame_at: float | None = None
+        self._playback_fps = 0.0
 
     @property
     def is_running(self) -> bool:
@@ -180,14 +189,30 @@ class VideoService:
 
                 frame_index = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1
                 self.current_frame_index = max(0, frame_index)
+                now = time.perf_counter()
+                if self._last_frame_at is not None:
+                    elapsed = max(0.0001, now - self._last_frame_at)
+                    self._playback_fps = 1.0 / elapsed
+                self._last_frame_at = now
                 metadata = self._metadata()
                 self.frame_callback(frame.copy(), metadata)
                 self._emit_progress()
 
                 if self._should_predict(self.current_frame_index):
                     try:
+                        prediction_started_at = time.perf_counter()
                         prediction = self.prediction_service.predict_frame(frame.copy())
-                        self.prediction_callback(prediction, frame.copy(), metadata)
+                        prediction_finished_at = time.perf_counter()
+                        prediction_metadata = dict(metadata)
+                        prediction_metadata.update(
+                            {
+                                "processing_time_ms": round((prediction_finished_at - prediction_started_at) * 1000, 2),
+                                "detection_video_timestamp": format_video_timestamp(metadata.get("current_second", 0.0)),
+                                "detection_frame_number": self.current_frame_index,
+                                "playback_fps": round(self._playback_fps, 2),
+                            }
+                        )
+                        self.prediction_callback(prediction, frame.copy(), prediction_metadata)
                     except Exception as exc:
                         self.error_callback(f"Prediction failed: {exc}")
 
@@ -199,6 +224,7 @@ class VideoService:
             cap.release()
             self._running = False
             self._stop_event.clear()
+            self._last_frame_at = None
 
     def _should_predict(self, frame_index: int) -> bool:
         with self._lock:
@@ -219,7 +245,10 @@ class VideoService:
             "source_path": self.video_path or "",
             "frame_index": self.current_frame_index,
             "current_second": current_second,
+            "detection_video_timestamp": format_video_timestamp(current_second),
+            "detection_frame_number": self.current_frame_index,
             "ai_interval": self.interval_label,
+            "playback_fps": round(self._playback_fps, 2),
         }
 
     def _emit_progress(self) -> None:
@@ -234,6 +263,7 @@ class VideoService:
                 "duration_seconds": duration,
                 "percent": percent,
                 "fps": self.fps,
+                "playback_fps": round(self._playback_fps, 2),
                 "speed": self.speed,
             }
         )
@@ -251,4 +281,3 @@ class VideoService:
             self.current_frame_index = max(0, frame_index)
             self.frame_callback(frame.copy(), self._metadata())
             self._emit_progress()
-

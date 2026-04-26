@@ -15,10 +15,28 @@
     "Rhinoceros",
     "Hippopotamus"
   ],
+  "severity_mapping": {
+    "Tiger": "CRITICAL",
+    "Leopard": "CRITICAL",
+    "Lion": "CRITICAL",
+    "Bear": "HIGH",
+    "Brown bear": "HIGH",
+    "Polar bear": "HIGH",
+    "Elephant": "HIGH",
+    "Wolf": "HIGH",
+    "Hyena": "HIGH",
+    "Crocodile": "HIGH",
+    "Rhinoceros": "HIGH",
+    "Hippopotamus": "HIGH",
+    "Snake": "WARNING",
+    "boar": "WARNING"
+  },
   "confidence_threshold": 0.70,
   "alert_cooldown_seconds": 120,
   "required_repeated_detections": 3,
   "camera_id": "CAM_01",
-  "camera_location": "Village Border Camera"
+  "camera_location": "Village Border Camera",
+  "source_type": "webcam",
+  "source_path": "0",
+  "siren_enabled": true
 }
-

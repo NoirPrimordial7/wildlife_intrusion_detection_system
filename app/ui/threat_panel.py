@@ -44,6 +44,12 @@ class ThreatPanel(ctk.CTkFrame):
         self.location_label = self._line(self.camera_card, 2, "Location: Village Border Camera")
         self.source_label = self._line(self.camera_card, 3, "Source: idle")
 
+        self.sms_card = self._card(3, "Phone Notification")
+        self.sms_enabled_label = self._line(self.sms_card, 1, "SMS Status: Disabled")
+        self.sms_provider_label = self._line(self.sms_card, 2, "SMS Provider: Twilio")
+        self.sms_users_label = self._line(self.sms_card, 3, "Registered users: 0")
+        self.sms_last_label = self._line(self.sms_card, 4, "Last notification: --")
+
     def _card(self, row: int, title: str) -> ctk.CTkFrame:
         frame = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=8)
         frame.grid(row=row, column=0, sticky="ew", pady=(0, 12))
@@ -102,3 +108,13 @@ class ThreatPanel(ctk.CTkFrame):
             source_text = f"{source_type}: {source_path}"
         self.source_label.configure(text=f"Source: {source_text or 'idle'}")
 
+    def update_sms_status(self, status: dict[str, Any]) -> None:
+        enabled = "Enabled" if status.get("enabled") else "Disabled"
+        provider = str(status.get("provider", "twilio")).replace("_", " ").title()
+        self.sms_enabled_label.configure(text=f"SMS Status: {enabled}")
+        self.sms_provider_label.configure(text=f"SMS Provider: {provider}")
+        self.sms_users_label.configure(text=f"Registered users: {status.get('registered_users_count', 0)}")
+        last = str(status.get("last_status", "--"))
+        error = status.get("last_error")
+        suffix = f" ({error})" if error else ""
+        self.sms_last_label.configure(text=f"Last notification: {last}{suffix}")

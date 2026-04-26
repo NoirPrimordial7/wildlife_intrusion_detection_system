@@ -19,7 +19,7 @@ class Sidebar(ctk.CTkFrame):
 
         title = ctk.CTkLabel(
             self,
-            text="Wildlife Alert\nSystem",
+            text="Video Intrusion\nDetection",
             font=ctk.CTkFont(size=22, weight="bold"),
             text_color=COLORS["text"],
             justify="left",
@@ -28,7 +28,7 @@ class Sidebar(ctk.CTkFrame):
 
         subtitle = ctk.CTkLabel(
             self,
-            text="Village Border Safety",
+            text="PC wildlife safety demo",
             font=ctk.CTkFont(size=13),
             text_color=COLORS["muted"],
             anchor="w",
@@ -36,9 +36,9 @@ class Sidebar(ctk.CTkFrame):
         subtitle.grid(row=1, column=0, sticky="ew", padx=22, pady=(0, 24))
 
         buttons = [
+            ("Upload Video", "upload_video"),
             ("Start Webcam Monitoring", "start_webcam"),
             ("Upload Image", "upload_image"),
-            ("Upload Video Demo", "upload_video"),
             ("Stop Monitoring", "stop_monitoring"),
             ("Export Report", "export_report"),
             ("Open Alerts Folder", "open_alerts"),
@@ -66,10 +66,9 @@ class Sidebar(ctk.CTkFrame):
 
         footer = ctk.CTkLabel(
             self,
-            text="AI runs at intervals to avoid\nunnecessary processing.",
+            text="Upload a video, then use\nStart Detection below preview.",
             font=ctk.CTkFont(size=12),
             text_color=COLORS["muted"],
             justify="left",
         )
         footer.grid(row=21, column=0, sticky="ew", padx=22, pady=(12, 24))
-

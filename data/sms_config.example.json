@@ -1,0 +1,20 @@
+{
+  "enabled": false,
+  "provider": "twilio",
+  "twilio": {
+    "account_sid": "",
+    "auth_token": "",
+    "from_number": ""
+  },
+  "fast2sms": {
+    "api_url": "https://www.fast2sms.com/dev/bulkV2",
+    "api_key": "",
+    "sender_id": "",
+    "route": "q"
+  },
+  "generic_http": {
+    "api_url": "",
+    "api_key": "",
+    "method": "POST"
+  }
+}

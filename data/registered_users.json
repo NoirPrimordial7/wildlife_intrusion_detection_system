@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Village Guard",
+    "phone": "+910000000000",
+    "enabled": true
+  },
+  {
+    "name": "Farm Owner",
+    "phone": "+910000000001",
+    "enabled": true
+  }
+]

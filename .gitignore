@@ -9,6 +9,10 @@ Thumbs.db
 assets/alerts/*.jpg
 assets/alerts/*.jpeg
 assets/alerts/*.png
+assets/alerts/clips/*.avi
+assets/alerts/clips/*.mp4
+assets/alerts/clips/*.mov
 assets/reports/*.txt
 data/firebase_config.json
-
+data/sms_config.json
+*.env

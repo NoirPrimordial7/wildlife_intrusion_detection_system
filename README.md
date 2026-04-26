@@ -1,138 +1,219 @@
 # AI Wildlife Intrusion Detection and Alert System
 
-## Problem statement
+## Current Scope
 
-Villages near forest-border areas can face danger from wild animals entering farms, roads, and residential zones. A monitoring system needs to watch camera or CCTV-like footage, detect potentially dangerous animals, and create clear alerts without spamming repeated notifications.
+This is a PC-based wildlife intrusion detection prototype. The main demo is:
 
-## Solution
+1. Run the desktop app.
+2. Upload a wildlife video or start webcam monitoring.
+3. Click `Start Detection`.
+4. The system checks frames at the selected interval.
+5. If a dangerous animal is confirmed, a `DANGER` alert triggers.
+6. Evidence is saved and enabled registered phone users are notified by SMS when configured.
 
-This project is a clean safety monitoring dashboard built with CustomTkinter. It loads the existing trained image classification model, runs predictions on webcam frames, demo videos, or uploaded images, evaluates danger rules, saves alert snapshots, records alert events, and keeps a notification service ready for future Firebase mobile alerts.
+The project does not retrain the model and does not require Raspberry Pi hardware.
 
-## Features
+## Real Phone Notifications
 
-- Webcam monitoring with AI prediction every 1 second by default.
-- Video demo mode with manual Start, Pause, Resume, Stop, Restart, -5 sec, +5 sec, speed, AI interval, and timeline controls.
-- Image test mode for quick model checks.
-- Threat levels: SAFE, WARNING, and DANGER.
-- Alert throttling with confidence threshold, repeated detection requirement, and cooldown.
-- Snapshot saving in `assets/alerts/`.
-- Alert event logging in `data/alert_events.json`.
-- Report export to `assets/reports/`.
-- Firebase placeholder config for future mobile notification integration.
-
-## Folder structure
+Real SMS is controlled by:
 
 ```text
-wildlife_alert_system_clean/
-  app/
-    main.py
-    ui/
-    core/
-    utils/
-  models/
-    animal_classification_model_final.h5
-  data/
-    class_names.json
-    animal_info.json
-    alert_config.json
-    alert_events.json
-    firebase_config.example.json
-  assets/
-    alerts/
-    reports/
-    test_videos/
-    test_images/
-    reference_images/
-  scripts/
-  requirements.txt
+data/sms_config.json
 ```
 
-## Setup on Windows
-
-Double-click:
+This file is ignored by Git so secrets are not committed. If it does not exist, the app creates it from:
 
 ```text
-setup_windows.bat
+data/sms_config.example.json
 ```
 
-Or run:
+Real SMS requires paid or free-trial credentials from an SMS provider. If `"enabled": false`, the app does not send SMS and logs notification attempts as `disabled`.
+
+## sms_config.json Format
+
+```json
+{
+  "enabled": false,
+  "provider": "twilio",
+  "twilio": {
+    "account_sid": "",
+    "auth_token": "",
+    "from_number": ""
+  },
+  "fast2sms": {
+    "api_url": "https://www.fast2sms.com/dev/bulkV2",
+    "api_key": "",
+    "sender_id": "",
+    "route": "q"
+  },
+  "generic_http": {
+    "api_url": "",
+    "api_key": "",
+    "method": "POST"
+  }
+}
+```
+
+## Twilio SMS Setup
+
+1. Install requirements:
 
 ```powershell
-.\setup_windows.ps1
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-The script checks Git and Python 3.10, creates `.venv`, installs requirements, runs the environment check, and runs the model smoke test.
-
-## Setup on Mac/Linux
-
-```bash
-chmod +x setup_unix.sh
-./setup_unix.sh
-```
-
-The script checks Git and `python3.10`, creates `.venv`, installs requirements, runs the environment check, and runs the model smoke test.
-
-## Run app
-
-From the project folder:
-
-```bash
-python app/main.py
-```
-
-If using the created virtual environment on Windows:
-
-```powershell
-.\.venv\Scripts\python.exe app/main.py
-```
-
-If using the created virtual environment on Mac/Linux:
-
-```bash
-./.venv/bin/python app/main.py
-```
-
-## Demo flow
-
-1. Start with `Upload Image` to confirm the model loads and produces predictions.
-2. Use `Upload Video Demo` to select a CCTV-like video. The first frame appears, but playback does not auto-start.
-3. Press `Start` in the video controls, choose playback speed, and choose AI interval.
-4. Use `Start Webcam Monitoring` for live camera monitoring.
-5. When alert rules are satisfied, the app saves a snapshot and appends an event.
-6. Use `Export Report` to generate a text report from saved alert events.
-
-## Alert logic
-
-Alerts are triggered only when all conditions are true:
-
-- The predicted animal is in `data/alert_config.json` under `dangerous_animals`.
-- Confidence is greater than or equal to `confidence_threshold`.
-- The same dangerous animal is detected repeatedly based on `required_repeated_detections`.
-- The alert cooldown has passed.
-
-Default example:
-
-```text
-Tiger detected 3 times with confidence >= 70%, and no alert in the last 120 seconds -> trigger DANGER alert.
-```
-
-## Firebase mobile notification future integration
-
-The current notification service sends local console/UI alerts and safely skips Firebase if it is disabled or missing. Future Firebase setup can copy `data/firebase_config.example.json` to `data/firebase_config.json` and enable:
+2. Edit `data/sms_config.json`:
 
 ```json
 {
   "enabled": true,
-  "project_id": "your-firebase-project-id",
-  "service_account_json": "path/to/service-account.json",
-  "topic": "wildlife_alerts"
+  "provider": "twilio",
+  "twilio": {
+    "account_sid": "your_account_sid",
+    "auth_token": "your_auth_token",
+    "from_number": "+1XXXXXXXXXX"
+  }
 }
 ```
 
-The method `send_fcm_notification(title, body, data=None)` is already present in `app/core/notification_service.py`.
+For Twilio trial accounts, recipient numbers may need to be verified in Twilio.
 
-## Limitations
+## Fast2SMS Setup
 
-The current model is image classification, not bounding-box detection. It predicts one main class for a frame or image and does not localize animals in the image.
+Edit `data/sms_config.json`:
 
-Future upgrade: use YOLO or another object detection model for multiple animals, bounding boxes, tracking, and stronger CCTV monitoring behavior.
+```json
+{
+  "enabled": true,
+  "provider": "fast2sms",
+  "fast2sms": {
+    "api_url": "https://www.fast2sms.com/dev/bulkV2",
+    "api_key": "your_fast2sms_api_key",
+    "sender_id": "",
+    "route": "q"
+  }
+}
+```
+
+The endpoint is configurable through `api_url`, so provider changes do not require code changes.
+
+## Generic HTTP SMS Setup
+
+Use this when another SMS gateway accepts HTTP requests.
+
+```json
+{
+  "enabled": true,
+  "provider": "generic_http",
+  "generic_http": {
+    "api_url": "https://example.com/send-sms",
+    "api_key": "your_api_key",
+    "method": "POST"
+  }
+}
+```
+
+The app sends JSON:
+
+```json
+{
+  "to": "+91XXXXXXXXXX",
+  "message": "Wildlife Alert...",
+  "name": "Village Guard"
+}
+```
+
+## Registered Users
+
+Registered users are stored in:
+
+```text
+data/registered_users.json
+```
+
+Format:
+
+```json
+[
+  {
+    "name": "Village Guard",
+    "phone": "+910000000000",
+    "enabled": true
+  }
+]
+```
+
+Phone numbers must use international format, for example `+91XXXXXXXXXX`.
+
+The app settings panel supports:
+
+- add person name
+- add phone number
+- enable or disable user
+- delete user
+- save users
+- test SMS per user
+
+## Test SMS
+
+Send a test SMS to all enabled registered users:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\test_sms.py
+```
+
+Send a test SMS to one number:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\test_sms.py --to "+91XXXXXXXXXX"
+```
+
+If SMS is disabled, this command will not send a real SMS. It will log `disabled` to:
+
+```text
+data/notification_log.json
+```
+
+## Alert SMS Message
+
+Danger alerts send:
+
+```text
+Wildlife Alert: {animal} detected near {camera_location}. Confidence: {confidence}%. Time: {timestamp}. Move domestic animals to safety and stay indoors.
+```
+
+## SMS Spam Prevention
+
+SMS is only attempted when a real `DANGER` alert is triggered. The existing confidence threshold, repeated detection rule, and alert cooldown must pass first, so SMS is not sent on every frame.
+
+## Evidence and Metrics
+
+For each danger alert, the system records:
+
+- video filename
+- detection video timestamp
+- detection frame number
+- AI processing time in milliseconds
+- alert decision time in milliseconds
+- current playback FPS
+- snapshot path
+- notification status
+
+## Model Limitation
+
+The current `.h5` model is image classification, not object detection. It identifies the main animal in a frame but cannot provide exact bounding boxes. The app shows a full-frame red border during danger state. Exact animal location requires a future YOLO/object-detection upgrade.
+
+## Run App
+
+```powershell
+cd C:\projects\VanRakshak\wildlife_alert_system_clean
+.\.venv\Scripts\python.exe app\main.py
+```
+
+## Verification
+
+```powershell
+.\.venv\Scripts\python.exe scripts\test_model.py
+.\.venv\Scripts\python.exe scripts\check_environment.py
+.\.venv\Scripts\python.exe app\main.py
+```
