@@ -33,9 +33,18 @@ class ReportService:
         if not isinstance(dangerous_animals, list):
             dangerous_animals = []
 
+        processing_times = [float(event.get("processing_time_ms", 0.0) or 0.0) for event in events]
+        decision_times = [float(event.get("alert_decision_time_ms", 0.0) or 0.0) for event in events]
+        snapshots = [str(event.get("snapshot_path", "")) for event in events if event.get("snapshot_path")]
+
         lines: list[str] = [
-            "AI Wildlife Intrusion Detection and Alert System",
-            "PC Video Intrusion Detection Report",
+            "# AI Wildlife Intrusion Detection and Alert System",
+            "",
+            "## Demo Report",
+            "",
+            "This report summarizes confirmed dangerous wildlife alerts produced during the PC video intrusion detection demo.",
+            "",
+            "## Summary",
             "",
             f"Video filename: {latest_event.get('video_filename', '--')}",
             f"Detection interval: {latest_event.get('ai_interval', config.get('detection_interval', '--'))}",
@@ -46,8 +55,11 @@ class ReportService:
             f"Dangerous animal list: {', '.join(str(name) for name in dangerous_animals)}",
             "",
             f"Total alerts: {len(events)}",
+            f"Average AI processing time: {(sum(processing_times) / len(processing_times)) if processing_times else 0.0:.2f} ms",
+            f"Average alert decision time: {(sum(decision_times) / len(decision_times)) if decision_times else 0.0:.2f} ms",
             "",
-            "Alerts by animal:",
+            "## Alerts by Animal",
+            "",
         ]
         if animal_counts:
             for animal, count in animal_counts.most_common():
@@ -55,10 +67,12 @@ class ReportService:
         else:
             lines.append("- No alert events recorded yet")
 
-        lines.extend(["", "All alert events:"])
+        lines.extend(["", "## Detection Timeline", ""])
         for event in events:
             lines.extend(
                 [
+                    f"### {event.get('animal', 'Unknown')} at {event.get('detection_video_timestamp', '--')}",
+                    "",
                     f"- Timestamp: {event.get('timestamp', '')}",
                     f"  Video time: {event.get('detection_video_timestamp', '--')}",
                     f"  Frame number: {event.get('detection_frame_number', '--')}",
@@ -79,6 +93,24 @@ class ReportService:
                 ]
             )
 
-        report_path = self.output_dir / f"wildlife_video_intrusion_report_{file_timestamp()}.txt"
+        lines.extend(["## Snapshot Evidence", ""])
+        if snapshots:
+            for snapshot in snapshots:
+                lines.append(f"- {snapshot}")
+        else:
+            lines.append("- No snapshot evidence recorded yet")
+
+        lines.extend(
+            [
+                "",
+                "## Notes for Demo",
+                "",
+                "- Bounding boxes come from YOLO animal-like object detection.",
+                "- Species names are cleaned for demo display, while raw classifier labels stay in event details.",
+                "- SMS remains disabled unless data/sms_config.json is intentionally enabled with provider credentials.",
+            ]
+        )
+
+        report_path = self.output_dir / f"wildlife_video_intrusion_report_{file_timestamp()}.md"
         report_path.write_text("\n".join(lines), encoding="utf-8")
         return relative_to_project(report_path)

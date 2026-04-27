@@ -36,6 +36,7 @@ class Sidebar(ctk.CTkFrame):
         subtitle.grid(row=1, column=0, sticky="ew", padx=22, pady=(0, 24))
 
         buttons = [
+            ("Quick Demo", "quick_demo"),
             ("Upload Video", "upload_video"),
             ("Start Webcam Monitoring", "start_webcam"),
             ("Upload Image", "upload_image"),
@@ -52,11 +53,11 @@ class Sidebar(ctk.CTkFrame):
                 height=42,
                 anchor="w",
                 command=self.callbacks.get(key),
-                fg_color=COLORS["accent"] if index == 2 else COLORS["surface_alt"],
+                fg_color=COLORS["critical"] if key == "quick_demo" else COLORS["accent"] if key == "upload_video" else COLORS["surface_alt"],
                 hover_color=COLORS["accent_hover"],
                 text_color=COLORS["text"],
                 corner_radius=6,
-                font=ctk.CTkFont(size=14, weight="bold" if index == 2 else "normal"),
+                font=ctk.CTkFont(size=14, weight="bold" if key in {"quick_demo", "upload_video"} else "normal"),
             )
             button.grid(row=index, column=0, sticky="ew", padx=18, pady=6)
 

@@ -20,6 +20,7 @@ class CameraPanel(ctk.CTkFrame):
         self.video_callbacks = video_callbacks
         self._image: ctk.CTkImage | None = None
         self._updating_slider = False
+        self.marker_frame: ctk.CTkFrame | None = None
         self._build()
 
     def _build(self) -> None:
@@ -121,6 +122,10 @@ class CameraPanel(ctk.CTkFrame):
         self.timeline.set(0)
         self.timeline.grid(row=1, column=0, columnspan=10, sticky="ew", padx=12, pady=(0, 12))
 
+        self.marker_frame = ctk.CTkFrame(self.controls, fg_color="transparent")
+        self.marker_frame.grid(row=2, column=0, columnspan=10, sticky="ew", padx=12, pady=(0, 10))
+        self.marker_frame.grid_columnconfigure(tuple(range(12)), weight=1)
+
     def _build_bottom_status(self) -> None:
         self.bottom_status = ctk.CTkFrame(self.preview_area, fg_color="#151a22", corner_radius=6)
         self.bottom_status.place(relx=0.015, rely=0.94, relwidth=0.97, anchor="sw")
@@ -147,7 +152,7 @@ class CameraPanel(ctk.CTkFrame):
         callback = self.video_callbacks.get("interval")
         if callback:
             callback(value)
-        self.interval_label.configure(text=f"AI interval: {value}")
+        self.next_check_label.configure(text=f"Next: {value}")
 
     def _on_timeline_change(self, value: float) -> None:
         if self._updating_slider:
@@ -237,3 +242,27 @@ class CameraPanel(ctk.CTkFrame):
         self._updating_slider = True
         self.timeline.set(float(progress.get("percent", 0.0)))
         self._updating_slider = False
+
+    def set_timeline_markers(self, markers: list[dict[str, Any]], on_click: Callable[[int], None]) -> None:
+        if self.marker_frame is None:
+            return
+        for child in self.marker_frame.winfo_children():
+            child.destroy()
+        recent = markers[-12:]
+        if not recent:
+            return
+        for index, marker in enumerate(recent):
+            level = str(marker.get("level", "LOW")).upper()
+            color = threat_color("DANGER" if level == "DANGER" else "WARNING" if level == "WARNING" else "LOW")
+            frame_number = int(marker.get("frame", 0) or 0)
+            button = ctk.CTkButton(
+                self.marker_frame,
+                text="",
+                width=18,
+                height=18,
+                corner_radius=9,
+                fg_color=color,
+                hover_color=color,
+                command=lambda value=frame_number: on_click(value),
+            )
+            button.grid(row=0, column=index, padx=3, pady=2)

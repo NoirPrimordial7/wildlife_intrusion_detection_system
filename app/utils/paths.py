@@ -14,6 +14,7 @@ ASSETS_DIR = PROJECT_ROOT / "assets"
 LOGS_DIR = PROJECT_ROOT / "logs"
 DOCS_DIR = PROJECT_ROOT / "docs"
 ALERTS_DIR = ASSETS_DIR / "alerts"
+SNAPSHOTS_DIR = ALERTS_DIR / "snapshots"
 CLIPS_DIR = ALERTS_DIR / "clips"
 REPORTS_DIR = ASSETS_DIR / "reports"
 TEST_IMAGES_DIR = ASSETS_DIR / "test_images"
@@ -41,6 +42,7 @@ def ensure_project_dirs() -> None:
         MODELS_DIR,
         DATA_DIR,
         ALERTS_DIR,
+        SNAPSHOTS_DIR,
         CLIPS_DIR,
         REPORTS_DIR,
         TEST_IMAGES_DIR,

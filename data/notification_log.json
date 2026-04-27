@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "timestamp": "2026-04-27T19:07:48+05:30",
+    "user_name": "Village Guard",
+    "phone": "+910000000000",
+    "message": "DANGER: Tiger spotted near Village Border Camera. Confidence: 100%. Time: 00:07.55. Move domestic animals to safety and stay indoors.",
+    "provider": "twilio",
+    "status": "disabled",
+    "error": "Real SMS disabled. Enable data/sms_config.json."
+  },
+  {
+    "timestamp": "2026-04-27T19:07:48+05:30",
+    "user_name": "Farm Owner",
+    "phone": "+910000000001",
+    "message": "DANGER: Tiger spotted near Village Border Camera. Confidence: 100%. Time: 00:07.55. Move domestic animals to safety and stay indoors.",
+    "provider": "twilio",
+    "status": "disabled",
+    "error": "Real SMS disabled. Enable data/sms_config.json."
+  },
+  {
+    "timestamp": "2026-04-27T19:09:16+05:30",
+    "user_name": "Village Guard",
+    "phone": "+910000000000",
+    "message": "DANGER: Elephant spotted near Village Border Camera. Confidence: 100%. Time: 00:10.91. Move domestic animals to safety and stay indoors.",
+    "provider": "twilio",
+    "status": "disabled",
+    "error": "Real SMS disabled. Enable data/sms_config.json."
+  },
+  {
+    "timestamp": "2026-04-27T19:09:16+05:30",
+    "user_name": "Farm Owner",
+    "phone": "+910000000001",
+    "message": "DANGER: Elephant spotted near Village Border Camera. Confidence: 100%. Time: 00:10.91. Move domestic animals to safety and stay indoors.",
+    "provider": "twilio",
+    "status": "disabled",
+    "error": "Real SMS disabled. Enable data/sms_config.json."
+  }
+]

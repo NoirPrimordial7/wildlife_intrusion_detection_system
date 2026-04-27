@@ -31,13 +31,13 @@
     "Snake": "WARNING",
     "boar": "WARNING"
   },
-  "confidence_threshold": 0.70,
-  "alert_cooldown_seconds": 120,
+  "confidence_threshold": 0.7,
+  "alert_cooldown_seconds": 30,
   "required_repeated_detections": 3,
   "camera_id": "CAM_01",
   "camera_location": "Village Border Camera",
-  "source_type": "webcam",
-  "source_path": "0",
   "siren_enabled": true,
-  "message_template": "DANGER: {animal} spotted near {camera_location}. Confidence: {confidence}%. Time: {timestamp}. Move domestic animals to safety and stay indoors."
+  "message_template": "DANGER: {animal} spotted near {camera_location}. Confidence: {confidence}%. Time: {timestamp}. Move domestic animals to safety and stay indoors.",
+  "source_type": "webcam",
+  "source_path": "0"
 }

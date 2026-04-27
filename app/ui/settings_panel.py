@@ -78,7 +78,7 @@ class SettingsPanel(ctk.CTkFrame):
 
         siren_toggle = ctk.CTkCheckBox(
             self,
-            text="Enable Siren",
+            text="Enable Alarm Sound",
             variable=self.siren_enabled_var,
             text_color=COLORS["text"],
             fg_color=COLORS["accent"],

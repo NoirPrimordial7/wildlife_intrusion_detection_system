@@ -73,6 +73,7 @@ def draw_detection_overlay(frame: np.ndarray, prediction_result: dict[str, Any],
             (0, 165, 255),
             thickness,
         )
+    _draw_legend_and_watermark(output)
     return output
 
 
@@ -102,3 +103,21 @@ def _draw_box(frame: np.ndarray, x1: int, y1: int, x2: int, y2: int, label: str,
     cv2.rectangle(overlay, (x1, label_y1), (label_x2, y1), color, -1)
     cv2.addWeighted(overlay, 0.82, frame, 0.18, 0, frame)
     cv2.putText(frame, label, (x1 + 6, max(16, y1 - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.62, (255, 255, 255), 2, cv2.LINE_AA)
+
+
+def _draw_legend_and_watermark(frame: np.ndarray) -> None:
+    height, width = frame.shape[:2]
+    watermark = "AI Wildlife Monitoring System"
+    cv2.putText(frame, watermark, (18, height - 18), cv2.FONT_HERSHEY_SIMPLEX, 0.62, (255, 255, 255), 2, cv2.LINE_AA)
+
+    legend = [("Danger", (0, 0, 255)), ("Warning", (0, 190, 255)), ("Safe", (0, 180, 80))]
+    box_w, box_h = 210, 88
+    x0 = max(8, width - box_w - 18)
+    y0 = 18
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (x0, y0), (x0 + box_w, y0 + box_h), (8, 14, 20), -1)
+    cv2.addWeighted(overlay, 0.72, frame, 0.28, 0, frame)
+    for i, (label, color) in enumerate(legend):
+        y = y0 + 24 + i * 22
+        cv2.circle(frame, (x0 + 18, y - 5), 6, color, -1)
+        cv2.putText(frame, f"{label}", (x0 + 34, y), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (255, 255, 255), 1, cv2.LINE_AA)
