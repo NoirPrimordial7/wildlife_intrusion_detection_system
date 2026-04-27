@@ -39,7 +39,7 @@ class Dashboard(ctk.CTk):
         super().__init__()
         ensure_project_dirs()
 
-        self.title("Video Intrusion Detection - Wildlife Alert System")
+        self.title("VanRakshak AI Wildlife Monitoring System")
         self.geometry("1480x860")
         self.minsize(1160, 720)
         self.configure(fg_color=COLORS["app_bg"])
@@ -359,8 +359,9 @@ class Dashboard(ctk.CTk):
             self._show_error(f"SMS settings could not be saved: {exc}")
 
     def test_sms_user(self, user: dict[str, Any]) -> None:
-        if not self.notification_service.load_sms_config().get("enabled"):
-            messagebox.showwarning("SMS disabled", "Real SMS is disabled. No test SMS was sent.")
+        sms_config = self.notification_service.load_sms_config()
+        if not sms_config.get("enabled"):
+            messagebox.showinfo("SMS not active", "SMS is disabled for demo. Enable it in Settings after adding credentials.")
             self.refresh_notification_views()
             return
         result = self.notification_service.send_test_sms(user)
@@ -370,9 +371,10 @@ class Dashboard(ctk.CTk):
         if status == "sent":
             messagebox.showinfo("Test SMS sent", f"SMS sent to {result.get('phone', '')}.")
         elif status == "disabled":
-            messagebox.showwarning("SMS disabled", "Real SMS disabled. Enable data/sms_config.json.")
+            messagebox.showinfo("SMS not active", "SMS is disabled for demo. Enable it in Settings after adding credentials.")
         else:
-            messagebox.showerror("Test SMS failed", str(error or "Unknown SMS error"))
+            self.alert_service.logger.warning("SMS test failed: provider=%s error=%s", sms_config.get("provider", "twilio"), error)
+            messagebox.showinfo("SMS not configured", "SMS is not configured yet. Please add Twilio credentials in Settings.")
 
     def stop_alarm(self) -> None:
         self.siren_service.stop()
@@ -448,7 +450,7 @@ class Dashboard(ctk.CTk):
 
         if prediction.get("detections") or (threat_level in {"DANGER", "HIGH", "CRITICAL", "WARNING"} and decision.get("severity") != "LOW"):
             self.camera_panel.set_frame(draw_detection_overlay(frame, prediction, str(threat_level)))
-            self._add_timeline_marker(metadata, str(threat_level))
+            self._add_timeline_marker(metadata, str(threat_level), prediction)
 
         self.camera_panel.set_status(
             animal=prediction.get("display_label", prediction.get("label", "--")),
@@ -495,11 +497,15 @@ class Dashboard(ctk.CTk):
     def _on_video_progress_from_worker(self, progress: dict[str, Any]) -> None:
         self.after(0, lambda: self.camera_panel.set_progress(progress))
 
-    def _add_timeline_marker(self, metadata: dict[str, Any], level: str) -> None:
+    def _add_timeline_marker(self, metadata: dict[str, Any], level: str, prediction: dict[str, Any] | None = None) -> None:
+        prediction = prediction or self._last_stable_prediction or {}
         self._timeline_markers.append(
             {
                 "frame": int(metadata.get("detection_frame_number", metadata.get("frame_index", 0)) or 0),
                 "level": level,
+                "time": str(metadata.get("detection_video_timestamp", metadata.get("last_checked_time", "--"))),
+                "animal": str(prediction.get("display_label", prediction.get("label", "--"))),
+                "confidence": float(prediction.get("confidence", 0.0) or 0.0),
             }
         )
         self._timeline_markers = self._timeline_markers[-80:]

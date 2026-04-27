@@ -19,6 +19,7 @@ DEFAULT_HYBRID_CONFIG = {
     "hide_low_confidence_classifier_labels": True,
     "minimum_display_confidence": 0.50,
     "prefer_yolo_label_for_non_dangerous_low_confidence": True,
+    "dangerous_classifier_override_confidence": 0.65,
 }
 
 
@@ -36,6 +37,7 @@ class HybridDetector:
         self.hide_low_confidence_classifier_labels = bool(self.config.get("hide_low_confidence_classifier_labels", True))
         self.minimum_display_confidence = float(self.config.get("minimum_display_confidence", 0.50))
         self.prefer_yolo_for_low_confidence = bool(self.config.get("prefer_yolo_label_for_non_dangerous_low_confidence", True))
+        self.dangerous_classifier_override_confidence = float(self.config.get("dangerous_classifier_override_confidence", 0.65))
         self.yolo_display_labels = {
             normalize_key(label)
             for label in self.config.get("animal_like_classes", [])
@@ -87,18 +89,23 @@ class HybridDetector:
             classifier_confidence = float(classifier_prediction.get("confidence", 0.0))
             yolo_label = display_label(str(yolo_detection.get("label", "Unknown")))
             yolo_confidence = float(yolo_detection.get("confidence", 0.0))
+            dangerous_classifier_override = (
+                self.is_dangerous(normalized_classifier_label)
+                and classifier_confidence >= self.dangerous_classifier_override_confidence
+            )
 
             prefer_yolo_for_demo = (
                 self.prefer_yolo_for_low_confidence
+                and not dangerous_classifier_override
                 and not self.is_dangerous(normalized_classifier_label)
                 and normalize_key(normalized_classifier_label) not in self.yolo_display_labels
                 and yolo_confidence >= self.minimum_display_confidence
             )
 
-            if classifier_confidence >= self.classifier_confidence and not prefer_yolo_for_demo:
+            if (classifier_confidence >= self.classifier_confidence or dangerous_classifier_override) and not prefer_yolo_for_demo:
                 final_label = normalized_classifier_label
                 final_confidence = classifier_confidence
-                label_source = "classifier"
+                label_source = "classifier_danger_override" if dangerous_classifier_override else "classifier"
             else:
                 final_label = yolo_label
                 final_confidence = yolo_confidence

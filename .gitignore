@@ -23,3 +23,10 @@ assets/evaluation/
 assets/reports/
 assets/test_videos/
 logs/*.log
+build/
+dist/
+release/
+*.spec
+pyinstaller*.log
+launcher_build.log
+pip_build*.log

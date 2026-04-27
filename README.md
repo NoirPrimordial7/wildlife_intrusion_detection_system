@@ -270,6 +270,28 @@ cd C:\projects\VanRakshak\wildlife_alert_system_clean
 .\.venv\Scripts\python.exe app\main.py
 ```
 
+## Fresh Windows PC Setup
+
+On a brand-new Windows 10/11 PC, use:
+
+```text
+install_windows_full.bat
+```
+
+This checks or installs Git and Python 3.10, creates `.venv`, installs all Python packages, prepares YOLOv8n weights, runs verification, and creates a desktop shortcut:
+
+```text
+VanRakshak AI Wildlife Monitoring System
+```
+
+Full instructions are in:
+
+```text
+docs/FRESH_WINDOWS_SETUP.md
+```
+
+SMS remains disabled by default. `data/sms_config.json` is ignored by Git and should not be committed.
+
 ## Demo Detection Flow
 
 1. Upload a video.

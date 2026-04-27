@@ -41,7 +41,8 @@ def draw_detection_overlay(frame: np.ndarray, prediction_result: dict[str, Any],
     if isinstance(config, dict) and not bool(config.get("draw_bounding_boxes", True)):
         return output
     thickness = max(3, int(config.get("box_thickness", 3) if isinstance(config, dict) else 3))
-    draw_yolo = bool(config.get("draw_yolo_debug_label", True)) if isinstance(config, dict) else True
+    demo_clean = bool(config.get("demo_mode_clean_labels", True)) if isinstance(config, dict) else True
+    draw_yolo = bool(config.get("draw_yolo_debug_label", False)) and not demo_clean if isinstance(config, dict) else False
     detections = prediction_result.get("detections") if isinstance(prediction_result.get("detections"), list) else []
     if detections:
         for detection in detections:
@@ -59,7 +60,7 @@ def draw_detection_overlay(frame: np.ndarray, prediction_result: dict[str, Any],
             box_color = _box_color(detection, level)
             text = f"{label} {confidence:.0%}"
             if draw_yolo and yolo_label and yolo_label != "--":
-                text = f"{text} | YOLO: {yolo_label} {yolo_conf:.0%}"
+                text = f"{text} | {yolo_label} ({yolo_conf:.0%})"
             _draw_box(output, x1, y1, x2, y2, text, box_color, thickness)
     else:
         region = estimate_detection_region(output, prediction_result)

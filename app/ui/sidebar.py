@@ -19,7 +19,7 @@ class Sidebar(ctk.CTkFrame):
 
         title = ctk.CTkLabel(
             self,
-            text="Video Intrusion\nDetection",
+            text="VanRakshak AI\nWildlife Monitoring",
             font=ctk.CTkFont(size=22, weight="bold"),
             text_color=COLORS["text"],
             justify="left",

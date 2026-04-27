@@ -265,4 +265,10 @@ class CameraPanel(ctk.CTkFrame):
                 hover_color=color,
                 command=lambda value=frame_number: on_click(value),
             )
+            tooltip = (
+                f"Time: {marker.get('time', '--')}\n"
+                f"Animal: {marker.get('animal', '--')}\n"
+                f"Confidence: {float(marker.get('confidence', 0.0) or 0.0):.0%}"
+            )
+            button.bind("<Enter>", lambda _event, text=tooltip: self.time_label.configure(text=text.replace("\n", " | ")))
             button.grid(row=0, column=index, padx=3, pady=2)

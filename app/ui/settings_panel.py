@@ -34,6 +34,7 @@ class SettingsPanel(ctk.CTkFrame):
         self.on_save_sms_config = on_save_sms_config
         self.on_refresh_status = on_refresh_status
         self.user_rows: list[dict[str, Any]] = []
+        self._tooltip: ctk.CTkToplevel | None = None
         self.threshold_var = ctk.DoubleVar(value=float(config.get("confidence_threshold", 0.70)))
         self.siren_enabled_var = ctk.BooleanVar(value=bool(config.get("siren_enabled", True)))
         self.cooldown_var = ctk.StringVar(value=str(config.get("alert_cooldown_seconds", 120)))
@@ -164,8 +165,16 @@ class SettingsPanel(ctk.CTkFrame):
         summary = self._masked_sms_summary()
         self.sms_secret_label = ctk.CTkLabel(self, text=summary, text_color=COLORS["muted"], anchor="w", justify="left", wraplength=310)
         self.sms_secret_label.grid(row=start_row + 3, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 8))
+        self.sms_ready_label = ctk.CTkLabel(
+            self,
+            text=self._sms_ready_text(),
+            text_color=COLORS["safe"] if self._sms_provider_ready() else COLORS["critical"],
+            anchor="w",
+            font=ctk.CTkFont(size=12, weight="bold"),
+        )
+        self.sms_ready_label.grid(row=start_row + 4, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 8))
         refresh_button = ctk.CTkButton(self, text="Refresh Status", height=30, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self._refresh_status)
-        refresh_button.grid(row=start_row + 4, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 10))
+        refresh_button.grid(row=start_row + 5, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 10))
 
     def _masked_sms_summary(self) -> str:
         twilio = self.sms_config.get("twilio", {}) if isinstance(self.sms_config.get("twilio"), dict) else {}
@@ -174,6 +183,26 @@ class SettingsPanel(ctk.CTkFrame):
             "Auth token: hidden\n"
             f"From number: {mask_phone(twilio.get('from_number', ''))}"
         )
+
+    def _sms_provider_ready(self) -> bool:
+        provider = self.sms_provider_var.get().strip().casefold().replace(" ", "_")
+        if provider == "twilio":
+            twilio = self.sms_config.get("twilio", {}) if isinstance(self.sms_config.get("twilio"), dict) else {}
+            return all(str(twilio.get(key, "")).strip() for key in ("account_sid", "auth_token", "from_number"))
+        if provider == "fast2sms":
+            fast2sms = self.sms_config.get("fast2sms", {}) if isinstance(self.sms_config.get("fast2sms"), dict) else {}
+            return bool(str(fast2sms.get("api_key", "")).strip())
+        generic = self.sms_config.get("generic_http", {}) if isinstance(self.sms_config.get("generic_http"), dict) else {}
+        return bool(str(generic.get("api_url", "")).strip())
+
+    def _sms_test_ready(self) -> bool:
+        return bool(self.sms_enabled_var.get()) and self._sms_provider_ready()
+
+    def _sms_ready_text(self) -> str:
+        provider = self.sms_provider_var.get().strip() or "Twilio"
+        if self._sms_provider_ready():
+            return f"{provider} ready"
+        return f"{provider} not configured"
 
     def _provider_display(self, provider: str) -> str:
         key = provider.strip().casefold().replace(" ", "_")
@@ -188,6 +217,12 @@ class SettingsPanel(ctk.CTkFrame):
         updates = {"enabled": bool(self.sms_enabled_var.get()), "provider": provider}
         if self.on_save_sms_config:
             self.on_save_sms_config(updates)
+        if hasattr(self, "sms_ready_label"):
+            self.sms_ready_label.configure(
+                text=self._sms_ready_text(),
+                text_color=COLORS["safe"] if self._sms_provider_ready() else COLORS["critical"],
+            )
+        self._render_user_rows()
 
     def _refresh_status(self) -> None:
         if self.on_refresh_status:
@@ -324,10 +359,12 @@ class SettingsPanel(ctk.CTkFrame):
                 text="Test SMS",
                 height=28,
                 corner_radius=6,
-                fg_color=COLORS["accent"],
+                fg_color=COLORS["accent"] if self._sms_test_ready() else COLORS["border"],
                 hover_color=COLORS["accent_hover"],
                 command=lambda idx=index: self._test_user_sms(idx),
+                state="normal" if self._sms_test_ready() else "disabled",
             )
+            self._attach_tooltip(test_button, "Requires Twilio configuration")
             test_button.grid(row=0, column=0, sticky="ew", padx=(0, 4))
             delete_button = ctk.CTkButton(
                 actions,
@@ -343,7 +380,7 @@ class SettingsPanel(ctk.CTkFrame):
 
         self.user_message = ctk.CTkLabel(
             self.users_frame,
-            text="",
+            text="" if self._sms_test_ready() else "Test SMS requires Twilio configuration.",
             text_color=COLORS["muted"],
             anchor="w",
             wraplength=310,
@@ -391,3 +428,24 @@ class SettingsPanel(ctk.CTkFrame):
     def _set_user_message(self, message: str) -> None:
         if hasattr(self, "user_message"):
             self.user_message.configure(text=message)
+
+    def _attach_tooltip(self, widget: ctk.CTkBaseClass, text: str) -> None:
+        def show(_event: object) -> None:
+            self._hide_tooltip()
+            tooltip = ctk.CTkToplevel(self)
+            tooltip.overrideredirect(True)
+            tooltip.configure(fg_color=COLORS["surface_alt"])
+            x = self.winfo_pointerx() + 12
+            y = self.winfo_pointery() + 12
+            tooltip.geometry(f"+{x}+{y}")
+            label = ctk.CTkLabel(tooltip, text=text, text_color=COLORS["text"], font=ctk.CTkFont(size=12))
+            label.pack(padx=8, pady=5)
+            self._tooltip = tooltip
+
+        widget.bind("<Enter>", show)
+        widget.bind("<Leave>", lambda _event: self._hide_tooltip())
+
+    def _hide_tooltip(self) -> None:
+        if self._tooltip is not None and self._tooltip.winfo_exists():
+            self._tooltip.destroy()
+        self._tooltip = None

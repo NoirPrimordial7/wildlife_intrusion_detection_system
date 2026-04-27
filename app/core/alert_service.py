@@ -343,7 +343,8 @@ class AlertService:
         if sent:
             return f"SMS sent to {sent} users"
         if failed:
-            return f"SMS failed: {failed[0].get('error', 'unknown error')}"
+            self.logger.warning("SMS notification failed: %s", failed[0].get("error", "unknown error"))
+            return "SMS is not configured yet. Please add Twilio credentials in Settings."
         if disabled:
             return "Real SMS disabled. Enable data/sms_config.json."
         return str(results[0].get("status", "unknown"))
