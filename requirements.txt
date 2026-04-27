@@ -4,6 +4,7 @@ opencv-python>=4.10,<4.11
 numpy>=1.26,<2
 pillow
 customtkinter
+ultralytics
 imageio-ffmpeg
 requests
 twilio

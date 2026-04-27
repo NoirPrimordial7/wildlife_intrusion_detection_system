@@ -56,6 +56,12 @@ def check_customtkinter() -> str:
     return getattr(ctk, "__version__", "installed")
 
 
+def check_ultralytics() -> str:
+    import ultralytics
+
+    return getattr(ultralytics, "__version__", "installed")
+
+
 def require_file(path: Path) -> str:
     if not path.exists():
         raise FileNotFoundError(path)
@@ -69,6 +75,7 @@ def main() -> int:
         ("OpenCV import", check_opencv),
         ("Tkinter", check_tkinter),
         ("CustomTkinter import", check_customtkinter),
+        ("Ultralytics import", check_ultralytics),
         ("Model file", lambda: require_file(MODEL_PATH)),
         ("class_names.json", lambda: require_file(CLASS_NAMES_PATH)),
         ("animal_info.json", lambda: require_file(ANIMAL_INFO_PATH)),

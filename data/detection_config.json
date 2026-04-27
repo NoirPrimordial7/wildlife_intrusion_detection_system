@@ -1,0 +1,27 @@
+{
+  "mode": "hybrid",
+  "yolo_model": "yolov8n.pt",
+  "yolo_confidence": 0.25,
+  "classifier_confidence": 0.7,
+  "crop_padding": 0.15,
+  "max_detections_per_frame": 5,
+  "hide_low_confidence_classifier_labels": true,
+  "minimum_display_confidence": 0.50,
+  "prefer_yolo_label_for_non_dangerous_low_confidence": true,
+  "draw_bounding_boxes": true,
+  "draw_yolo_debug_label": true,
+  "box_thickness": 3,
+  "animal_like_classes": [
+    "bird",
+    "cat",
+    "dog",
+    "horse",
+    "sheep",
+    "cow",
+    "elephant",
+    "bear",
+    "zebra",
+    "giraffe"
+  ],
+  "sms_enabled_during_testing": false
+}

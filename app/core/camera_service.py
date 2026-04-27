@@ -7,9 +7,6 @@ from typing import Any, Callable
 
 import cv2
 
-from app.core.prediction_service import PredictionService
-
-
 FrameCallback = Callable[[Any, dict[str, Any]], None]
 PredictionCallback = Callable[[dict[str, Any], Any, dict[str, Any]], None]
 ErrorCallback = Callable[[str], None]
@@ -40,7 +37,7 @@ def _webcam_index(source_path: Any) -> int:
 class CameraService:
     def __init__(
         self,
-        prediction_service: PredictionService,
+        prediction_service: Any,
         frame_callback: FrameCallback,
         prediction_callback: PredictionCallback,
         error_callback: ErrorCallback,
@@ -129,8 +126,18 @@ class CameraService:
                 if now - last_prediction_at >= self.prediction_interval_seconds:
                     last_prediction_at = now
                     try:
+                        prediction_started_at = time.perf_counter()
                         prediction = self.prediction_service.predict_frame(frame.copy())
-                        self.prediction_callback(prediction, frame.copy(), metadata)
+                        prediction_finished_at = time.perf_counter()
+                        prediction_metadata = dict(metadata)
+                        prediction_metadata.update(
+                            {
+                                "processing_time_ms": round((prediction_finished_at - prediction_started_at) * 1000, 2),
+                                "detection_frame_number": int(metadata.get("frame_index", 0) or 0),
+                                "playback_fps": 0.0,
+                            }
+                        )
+                        self.prediction_callback(prediction, frame.copy(), prediction_metadata)
                     except Exception as exc:
                         self.error_callback(f"Prediction failed: {exc}")
 

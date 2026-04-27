@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import shutil
 import re
 from typing import Any
 
 from app.utils.paths import (
+    REPORTS_DIR,
     NOTIFICATION_LOG_PATH,
     REGISTERED_USERS_PATH,
     SMS_CONFIG_EXAMPLE_PATH,
@@ -46,6 +48,32 @@ def is_valid_phone(phone: str) -> bool:
     return bool(PHONE_PATTERN.match(str(phone).strip()))
 
 
+def parse_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+    return bool(value)
+
+
+def mask_value(value: Any, visible: int = 4) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return "missing"
+    if len(text) <= visible * 2:
+        return "*" * len(text)
+    return f"{text[:visible]}...{text[-visible:]}"
+
+
+def mask_phone(phone: Any) -> str:
+    text = str(phone or "").strip()
+    if len(text) <= 5:
+        return mask_value(text, 1)
+    if len(text) > 8:
+        return f"{text[:3]}{'*' * max(2, len(text) - 7)}{text[-4:]}"
+    return f"{text[:3]}...{text[-2:]}"
+
+
 class NotificationService:
     def __init__(self) -> None:
         self.registered_users_path = REGISTERED_USERS_PATH
@@ -58,7 +86,13 @@ class NotificationService:
         if not self.sms_config_example_path.exists():
             save_json(self.sms_config_example_path, DEFAULT_SMS_CONFIG)
         if not self.sms_config_path.exists():
-            save_json(self.sms_config_path, DEFAULT_SMS_CONFIG)
+            if self.sms_config_example_path.exists():
+                shutil.copyfile(self.sms_config_example_path, self.sms_config_path)
+            config = load_json(self.sms_config_path, DEFAULT_SMS_CONFIG)
+            if not isinstance(config, dict):
+                config = DEFAULT_SMS_CONFIG.copy()
+            config["enabled"] = False
+            save_json(self.sms_config_path, config)
         if not self.registered_users_path.exists():
             save_json(self.registered_users_path, DEFAULT_REGISTERED_USERS)
         if not self.notification_log_path.exists():
@@ -67,6 +101,22 @@ class NotificationService:
     def load_sms_config(self) -> dict[str, Any]:
         loaded = load_json(self.sms_config_path, {})
         return self._merge_sms_config(loaded if isinstance(loaded, dict) else {})
+
+    def debug_sms_config_summary(self) -> dict[str, Any]:
+        config = self.load_sms_config()
+        twilio_config = config.get("twilio", {}) if isinstance(config.get("twilio"), dict) else {}
+        return {
+            "config_path": str(self.sms_config_path.resolve()),
+            "config_exists": self.sms_config_path.exists(),
+            "enabled": config.get("enabled"),
+            "enabled_type": type(config.get("enabled")).__name__,
+            "provider": str(config.get("provider", "twilio")),
+            "twilio": {
+                "account_sid": mask_value(twilio_config.get("account_sid")),
+                "auth_token": mask_value(twilio_config.get("auth_token")),
+                "from_number": mask_phone(twilio_config.get("from_number")),
+            },
+        }
 
     def sms_status(self) -> dict[str, Any]:
         config = self.load_sms_config()
@@ -78,7 +128,20 @@ class NotificationService:
             "registered_users_count": len(users),
             "last_status": str(last.get("status", "--")) if last else "--",
             "last_error": last.get("error") if last else None,
+            "last_timestamp": last.get("timestamp") if last else None,
         }
+
+    def save_sms_config(self, updates: dict[str, Any]) -> dict[str, Any]:
+        config = self.load_sms_config()
+        if "enabled" in updates:
+            config["enabled"] = parse_bool(updates["enabled"])
+        if "provider" in updates:
+            provider = str(updates["provider"]).strip().casefold().replace(" ", "_")
+            if provider not in {"twilio", "fast2sms", "generic_http"}:
+                raise ValueError(f"Unsupported SMS provider: {updates['provider']}")
+            config["provider"] = provider
+        save_json(self.sms_config_path, config)
+        return self.load_sms_config()
 
     def last_notification(self) -> dict[str, Any] | None:
         logs = load_json(self.notification_log_path, [])
@@ -90,6 +153,36 @@ class NotificationService:
     def load_registered_users(self) -> list[dict[str, Any]]:
         users = load_json(self.registered_users_path, DEFAULT_REGISTERED_USERS)
         return users if isinstance(users, list) else []
+
+    def users_with_last_status(self) -> list[dict[str, Any]]:
+        logs = self.load_notification_log()
+        last_by_phone: dict[str, dict[str, Any]] = {}
+        for row in logs:
+            phone = str(row.get("phone", ""))
+            if phone:
+                last_by_phone[phone] = row
+        users = []
+        for user in self.load_registered_users():
+            row = dict(user)
+            last = last_by_phone.get(str(user.get("phone", "")), {})
+            row["last_status"] = last.get("status", "--")
+            row["last_timestamp"] = last.get("timestamp", "")
+            row["masked_phone"] = mask_phone(row.get("phone", ""))
+            users.append(row)
+        return users
+
+    def load_notification_log(self) -> list[dict[str, Any]]:
+        logs = load_json(self.notification_log_path, [])
+        return logs if isinstance(logs, list) else []
+
+    def clear_notification_log(self) -> None:
+        save_json(self.notification_log_path, [])
+
+    def export_notification_log(self) -> str:
+        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+        path = REPORTS_DIR / "notification_log_export.json"
+        save_json(path, self.load_notification_log())
+        return str(path)
 
     def save_registered_users(self, users: list[dict[str, Any]]) -> None:
         cleaned: list[dict[str, Any]] = []
@@ -114,7 +207,7 @@ class NotificationService:
 
         config = self.load_sms_config()
         provider = str(config.get("provider", "twilio")).strip().casefold()
-        if not config.get("enabled"):
+        if not parse_bool(config.get("enabled")):
             for user in users:
                 results.append(self._log_notification(user, message, provider, "disabled", "Real SMS disabled. Enable data/sms_config.json."))
             return results
@@ -134,7 +227,7 @@ class NotificationService:
         message = "Wildlife Alert test SMS. If you received this, phone notifications are configured."
         config = self.load_sms_config()
         provider = str(config.get("provider", "twilio")).strip().casefold()
-        if not config.get("enabled"):
+        if not parse_bool(config.get("enabled")):
             return self._log_notification(user, message, provider, "disabled", "Real SMS disabled. Enable data/sms_config.json.")
         if provider == "twilio":
             return self.send_sms_twilio(user, message, config)
@@ -167,7 +260,8 @@ class NotificationService:
             sent = client.messages.create(body=message, from_=from_number, to=str(user.get("phone", "")))
             return self._log_notification(user, message, "twilio", "sent", None, {"message_sid": getattr(sent, "sid", "")})
         except Exception as exc:
-            return self._log_notification(user, message, "twilio", "failed", str(exc))
+            error = self._mask_error(str(exc), account_sid, auth_token, from_number, user.get("phone", ""))
+            return self._log_notification(user, message, "twilio", "failed", error)
 
     def send_sms_fast2sms(
         self,
@@ -239,6 +333,8 @@ class NotificationService:
             return self._log_notification(user, message, "generic_http", "failed", str(exc))
 
     def message_for_event(self, alert_event: dict[str, Any]) -> str:
+        if alert_event.get("message"):
+            return str(alert_event["message"])
         confidence_percent = round(float(alert_event.get("confidence", 0.0)) * 100)
         return (
             f"Wildlife Alert: {alert_event.get('animal', 'Unknown')} detected near "
@@ -248,7 +344,7 @@ class NotificationService:
 
     def _merge_sms_config(self, loaded: dict[str, Any]) -> dict[str, Any]:
         config = {
-            "enabled": bool(loaded.get("enabled", DEFAULT_SMS_CONFIG["enabled"])),
+            "enabled": parse_bool(loaded.get("enabled", DEFAULT_SMS_CONFIG["enabled"])),
             "provider": str(loaded.get("provider", DEFAULT_SMS_CONFIG["provider"])),
             "twilio": DEFAULT_SMS_CONFIG["twilio"].copy(),
             "fast2sms": DEFAULT_SMS_CONFIG["fast2sms"].copy(),
@@ -277,6 +373,14 @@ class NotificationService:
         if phone.startswith("+91"):
             return phone[3:]
         return phone.lstrip("+")
+
+    def _mask_error(self, error: str, *sensitive_values: Any) -> str:
+        sanitized = error
+        for value in sensitive_values:
+            text = str(value or "").strip()
+            if text:
+                sanitized = sanitized.replace(text, mask_value(text))
+        return sanitized
 
     def _log_notification(
         self,

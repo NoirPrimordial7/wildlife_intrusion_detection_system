@@ -38,5 +38,6 @@
   "camera_location": "Village Border Camera",
   "source_type": "webcam",
   "source_path": "0",
-  "siren_enabled": true
+  "siren_enabled": true,
+  "message_template": "DANGER: {animal} spotted near {camera_location}. Confidence: {confidence}%. Time: {timestamp}. Move domestic animals to safety and stay indoors."
 }

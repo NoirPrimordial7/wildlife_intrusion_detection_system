@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from tkinter import messagebox
 from typing import Any, Callable
 
 import customtkinter as ctk
 
-from app.core.notification_service import is_valid_phone
+from app.core.notification_service import is_valid_phone, mask_phone
 from app.ui.theme import COLORS
 
 
@@ -18,6 +19,9 @@ class SettingsPanel(ctk.CTkFrame):
         registered_users: list[dict[str, Any]] | None = None,
         on_save_users: Callable[[list[dict[str, Any]]], None] | None = None,
         on_test_sms: Callable[[dict[str, Any]], None] | None = None,
+        sms_config: dict[str, Any] | None = None,
+        on_save_sms_config: Callable[[dict[str, Any]], None] | None = None,
+        on_refresh_status: Callable[[], None] | None = None,
     ) -> None:
         super().__init__(master, fg_color=COLORS["surface"], corner_radius=8)
         self.config = config
@@ -26,10 +30,16 @@ class SettingsPanel(ctk.CTkFrame):
         self.registered_users = list(registered_users or [])
         self.on_save_users = on_save_users
         self.on_test_sms = on_test_sms
+        self.sms_config = dict(sms_config or {})
+        self.on_save_sms_config = on_save_sms_config
+        self.on_refresh_status = on_refresh_status
         self.user_rows: list[dict[str, Any]] = []
         self.threshold_var = ctk.DoubleVar(value=float(config.get("confidence_threshold", 0.70)))
         self.siren_enabled_var = ctk.BooleanVar(value=bool(config.get("siren_enabled", True)))
+        self.cooldown_var = ctk.StringVar(value=str(config.get("alert_cooldown_seconds", 120)))
         self.new_user_enabled_var = ctk.BooleanVar(value=True)
+        self.sms_enabled_var = ctk.BooleanVar(value=bool(self.sms_config.get("enabled", False)))
+        self.sms_provider_var = ctk.StringVar(value=self._provider_display(str(self.sms_config.get("provider", "twilio"))))
         self._build()
 
     def _build(self) -> None:
@@ -63,7 +73,7 @@ class SettingsPanel(ctk.CTkFrame):
         threshold_slider.grid(row=2, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 12))
 
         self.repeat_entry = self._entry_row(3, "Repeated detections", str(self.config.get("required_repeated_detections", 3)))
-        self.cooldown_entry = self._entry_row(4, "Cooldown seconds", str(self.config.get("alert_cooldown_seconds", 120)))
+        self.cooldown_entry = self._cooldown_row(4)
         self.location_entry = self._entry_row(5, "Camera location", str(self.config.get("camera_location", "Village Border Camera")))
 
         siren_toggle = ctk.CTkCheckBox(
@@ -98,7 +108,8 @@ class SettingsPanel(ctk.CTkFrame):
         )
         save_button.grid(row=7, column=0, columnspan=2, sticky="ew", padx=16, pady=(10, 16))
 
-        self._build_registered_users(8)
+        self._build_sms_settings(8)
+        self._build_registered_users(15)
 
     def _entry_row(self, row: int, label_text: str, value: str) -> ctk.CTkEntry:
         label = ctk.CTkLabel(self, text=label_text, text_color=COLORS["muted"], anchor="w")
@@ -108,6 +119,13 @@ class SettingsPanel(ctk.CTkFrame):
         entry.grid(row=row, column=1, sticky="ew", padx=(8, 16), pady=5)
         return entry
 
+    def _cooldown_row(self, row: int) -> ctk.CTkOptionMenu:
+        label = ctk.CTkLabel(self, text="SMS cooldown", text_color=COLORS["muted"], anchor="w")
+        label.grid(row=row, column=0, sticky="ew", padx=(16, 8), pady=5)
+        menu = ctk.CTkOptionMenu(self, variable=self.cooldown_var, values=["30", "60", "120", "300"], width=110)
+        menu.grid(row=row, column=1, sticky="ew", padx=(8, 16), pady=5)
+        return menu
+
     def _on_threshold_change(self, value: float) -> None:
         self.threshold_value.configure(text=f"Threshold: {float(value):.0%}")
 
@@ -115,11 +133,65 @@ class SettingsPanel(ctk.CTkFrame):
         updates = {
             "confidence_threshold": round(float(self.threshold_var.get()), 2),
             "required_repeated_detections": max(1, int(self.repeat_entry.get())),
-            "alert_cooldown_seconds": max(0, int(self.cooldown_entry.get())),
+            "alert_cooldown_seconds": max(0, int(self.cooldown_var.get())),
             "camera_location": self.location_entry.get().strip() or "Village Border Camera",
             "siren_enabled": bool(self.siren_enabled_var.get()),
         }
         self.on_save(updates)
+
+    def _build_sms_settings(self, start_row: int) -> None:
+        divider = ctk.CTkFrame(self, fg_color=COLORS["border"], height=1)
+        divider.grid(row=start_row, column=0, columnspan=2, sticky="ew", padx=16, pady=(4, 12))
+        title = ctk.CTkLabel(self, text="Notification Settings", font=ctk.CTkFont(size=15, weight="bold"), text_color=COLORS["text"], anchor="w")
+        title.grid(row=start_row + 1, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 8))
+        sms_toggle = ctk.CTkSwitch(
+            self,
+            text="Enable Real SMS",
+            variable=self.sms_enabled_var,
+            command=self._save_sms_config,
+            text_color=COLORS["text"],
+            progress_color=COLORS["danger"],
+        )
+        sms_toggle.grid(row=start_row + 2, column=0, sticky="w", padx=16, pady=(4, 6))
+        provider_menu = ctk.CTkOptionMenu(
+            self,
+            variable=self.sms_provider_var,
+            values=["Twilio", "Fast2SMS", "Generic HTTP"],
+            command=lambda _value: self._save_sms_config(),
+            width=150,
+        )
+        provider_menu.grid(row=start_row + 2, column=1, sticky="ew", padx=(8, 16), pady=(4, 6))
+        summary = self._masked_sms_summary()
+        self.sms_secret_label = ctk.CTkLabel(self, text=summary, text_color=COLORS["muted"], anchor="w", justify="left", wraplength=310)
+        self.sms_secret_label.grid(row=start_row + 3, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 8))
+        refresh_button = ctk.CTkButton(self, text="Refresh Status", height=30, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self._refresh_status)
+        refresh_button.grid(row=start_row + 4, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 10))
+
+    def _masked_sms_summary(self) -> str:
+        twilio = self.sms_config.get("twilio", {}) if isinstance(self.sms_config.get("twilio"), dict) else {}
+        return (
+            f"Account SID: {mask_phone(twilio.get('account_sid', ''))}\n"
+            "Auth token: hidden\n"
+            f"From number: {mask_phone(twilio.get('from_number', ''))}"
+        )
+
+    def _provider_display(self, provider: str) -> str:
+        key = provider.strip().casefold().replace(" ", "_")
+        return {"twilio": "Twilio", "fast2sms": "Fast2SMS", "generic_http": "Generic HTTP"}.get(key, "Twilio")
+
+    def _save_sms_config(self) -> None:
+        if self.sms_enabled_var.get():
+            ok = messagebox.askyesno("Enable real SMS?", "Real SMS may use trial credits. Enable only for final testing.")
+            if not ok:
+                self.sms_enabled_var.set(False)
+        provider = self.sms_provider_var.get().strip().casefold().replace(" ", "_")
+        updates = {"enabled": bool(self.sms_enabled_var.get()), "provider": provider}
+        if self.on_save_sms_config:
+            self.on_save_sms_config(updates)
+
+    def _refresh_status(self) -> None:
+        if self.on_refresh_status:
+            self.on_refresh_status()
 
     def _build_registered_users(self, start_row: int) -> None:
         divider = ctk.CTkFrame(self, fg_color=COLORS["border"], height=1)
@@ -224,9 +296,10 @@ class SettingsPanel(ctk.CTkFrame):
             row = ctk.CTkFrame(self.users_frame, fg_color=COLORS["surface_alt"], corner_radius=6)
             row.grid(row=index, column=0, sticky="ew", pady=(0, 6))
             row.grid_columnconfigure(0, weight=1)
+            last_status = str(user.get("last_status", "--"))
             label = ctk.CTkLabel(
                 row,
-                text=f"{user.get('name', '')}\n{user.get('phone', '')}",
+                text=f"Name: {user.get('name', '')}\nPhone: {mask_phone(user.get('phone', ''))}\nLast Status: {last_status}",
                 text_color=COLORS["text"],
                 anchor="w",
                 justify="left",

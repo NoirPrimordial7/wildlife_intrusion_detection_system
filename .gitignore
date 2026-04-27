@@ -16,3 +16,10 @@ assets/reports/*.txt
 data/firebase_config.json
 data/sms_config.json
 *.env
+*.pt
+assets/alerts/*.jpg
+assets/alerts/clips/*.mp4
+assets/evaluation/
+assets/reports/
+assets/test_videos/
+logs/*.log

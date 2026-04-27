@@ -7,11 +7,37 @@ This is a PC-based wildlife intrusion detection prototype. The main demo is:
 1. Run the desktop app.
 2. Upload a wildlife video or start webcam monitoring.
 3. Click `Start Detection`.
-4. The system checks frames at the selected interval.
-5. If a dangerous animal is confirmed, a `DANGER` alert triggers.
-6. Evidence is saved and enabled registered phone users are notified by SMS when configured.
+4. The system runs YOLOv8 on sampled frames and draws bounding boxes around animal-like objects.
+5. Each YOLO crop is classified by the existing `.h5` model.
+6. If a dangerous animal is confirmed, a `DANGER` alert triggers.
+7. Evidence is saved and enabled registered phone users are notified by SMS when configured.
 
 The project does not retrain the model and does not require Raspberry Pi hardware.
+
+## Hybrid YOLO + Classifier Detection
+
+Pipeline:
+
+```text
+Video Frame
+  -> YOLOv8 animal-like object detection
+  -> crop bounding box
+  -> existing .h5 species classifier
+  -> final animal label
+  -> dangerous animal alert logic
+```
+
+YOLO detects broad animal-like classes:
+
+```text
+bird, cat, dog, horse, sheep, cow, elephant, bear, zebra, giraffe
+```
+
+The classifier decides the final species when its confidence is high enough. Detection settings live in:
+
+```text
+data/detection_config.json
+```
 
 ## Real Phone Notifications
 
@@ -28,6 +54,18 @@ data/sms_config.example.json
 ```
 
 Real SMS requires paid or free-trial credentials from an SMS provider. If `"enabled": false`, the app does not send SMS and logs notification attempts as `disabled`.
+
+SMS is disabled by default to protect trial credits. Enable it only during final demo/testing from the Notification Settings section in the app.
+
+The app now shows:
+
+- SMS enabled/disabled status
+- selected provider
+- registered user count
+- masked phone numbers
+- last notification status
+- notification log viewer
+- alert cooldown status
 
 ## sms_config.json Format
 
@@ -199,9 +237,31 @@ For each danger alert, the system records:
 - snapshot path
 - notification status
 
+## Evaluation Scripts
+
+Show help for video evaluation:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\evaluate_hybrid_on_video.py --help
+```
+
+Evaluate a video without sending SMS:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\evaluate_hybrid_on_video.py "C:\path\to\wildlife_video.mp4" --every 30 --max-frames 60
+```
+
+Evaluate one image:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\test_hybrid_on_image.py "C:\path\to\wildlife_image.jpg"
+```
+
+Outputs are saved under `assets/reports/`.
+
 ## Model Limitation
 
-The current `.h5` model is image classification, not object detection. It identifies the main animal in a frame but cannot provide exact bounding boxes. The app shows a full-frame red border during danger state. Exact animal location requires a future YOLO/object-detection upgrade.
+The current `.h5` model is image classification, not object detection. YOLOv8 now provides bounding boxes for broad animal-like classes, and the classifier identifies species from crops. Exact species-specific bounding boxes still require a future YOLO model trained on wildlife classes.
 
 ## Run App
 
@@ -210,10 +270,22 @@ cd C:\projects\VanRakshak\wildlife_alert_system_clean
 .\.venv\Scripts\python.exe app\main.py
 ```
 
+## Demo Detection Flow
+
+1. Upload a video.
+2. Click `Start Detection`.
+3. The app keeps video playback smooth and runs Hybrid YOLO + Classifier checks at the selected interval.
+4. The UI shows `AI Monitoring Active`, next check timing, and last checked frame/time.
+5. Bounding boxes are drawn directly from Hybrid YOLO detections with labels like `Tiger 92% | YOLO: bear 71%`.
+6. A danger alert triggers only after confidence, repeated detection, and cooldown rules pass.
+7. The right panel separates `Current Detection` from `Latest Confirmed Alert`, so an older alert does not look like the current frame.
+8. The DANGER banner shows animal, confidence, video timestamp, snapshot, notification status, and cooldown.
+
 ## Verification
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\test_model.py
 .\.venv\Scripts\python.exe scripts\check_environment.py
+.\.venv\Scripts\python.exe scripts\evaluate_hybrid_on_video.py --help
 .\.venv\Scripts\python.exe app\main.py
 ```

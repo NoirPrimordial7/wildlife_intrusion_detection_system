@@ -9,7 +9,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from app.core.notification_service import NotificationService, is_valid_phone
+from app.core.notification_service import NotificationService, is_valid_phone, mask_phone
 
 
 def main() -> int:
@@ -18,9 +18,20 @@ def main() -> int:
     args = parser.parse_args()
 
     service = NotificationService()
+    debug = service.debug_sms_config_summary()
+    twilio = debug["twilio"]
+    print("[CONFIG]")
+    print(f"  path: {debug['config_path']}")
+    print(f"  exists: {debug['config_exists']}")
+    print(f"  enabled: {debug['enabled']} ({debug['enabled_type']})")
+    print(f"  provider: {debug['provider']}")
+    print(f"  twilio.account_sid: {twilio['account_sid']}")
+    print(f"  twilio.auth_token: {twilio['auth_token']}")
+    print(f"  twilio.from_number: {twilio['from_number']}")
+
     if args.to:
         if not is_valid_phone(args.to):
-            print(f"[FAILED] Invalid phone number: {args.to}")
+            print(f"[FAILED] Invalid phone number: {mask_phone(args.to)}")
             return 1
         users = [{"name": "Manual Test", "phone": args.to, "enabled": True}]
     else:
@@ -35,7 +46,7 @@ def main() -> int:
         result = service.send_test_sms(user)
         status = result.get("status", "unknown")
         error = result.get("error")
-        print(f"[{str(status).upper()}] {result.get('user_name')} {result.get('phone')} provider={result.get('provider')}")
+        print(f"[{str(status).upper()}] {result.get('user_name')} {mask_phone(result.get('phone'))} provider={result.get('provider')}")
         if error:
             print(f"  error: {error}")
         if status not in {"sent", "disabled"}:

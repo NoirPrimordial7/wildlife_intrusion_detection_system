@@ -10,11 +10,13 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from app.ui.dashboard import run_dashboard
 from app.ui.theme import apply_theme
+from app.utils.logging_utils import get_logger
 from app.utils.paths import ensure_project_dirs
 
 
 def main() -> None:
     ensure_project_dirs()
+    get_logger("wildlife.system", "system.log").info("System start")
     apply_theme()
     run_dashboard()
 

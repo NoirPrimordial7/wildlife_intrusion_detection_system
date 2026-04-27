@@ -10,9 +10,11 @@ import numpy as np
 
 from app.core.clip_service import ClipService
 from app.core.detection_localizer import estimate_detection_region
+from app.core.label_normalizer import normalize_key, normalize_label
 from app.core.notification_service import NotificationService
 from app.core.siren_service import SirenService
 from app.core.snapshot_service import SnapshotService
+from app.utils.logging_utils import get_logger
 from app.utils.paths import ALERT_CONFIG_PATH, ALERT_EVENTS_PATH, load_json, save_json
 from app.utils.time_utils import iso_timestamp
 
@@ -56,6 +58,7 @@ DEFAULT_ALERT_CONFIG = {
     "camera_id": "CAM_01",
     "camera_location": "Village Border Camera",
     "siren_enabled": True,
+    "message_template": "DANGER: {animal} spotted near {camera_location}. Confidence: {confidence}%. Time: {timestamp}. Move domestic animals to safety and stay indoors.",
 }
 
 
@@ -67,7 +70,7 @@ class CameraAlertState:
 
 
 def _normalize_name(name: str) -> str:
-    return " ".join(str(name).replace("_", " ").split()).casefold()
+    return normalize_key(name)
 
 
 class AlertService:
@@ -86,6 +89,7 @@ class AlertService:
         self.events_path = ALERT_EVENTS_PATH
         self._lock = threading.Lock()
         self._states: dict[str, CameraAlertState] = {}
+        self.logger = get_logger("wildlife.alerts", "alert.log")
         self.ensure_files()
         self.config = self.load_config()
         if self.siren_service is not None:
@@ -156,8 +160,13 @@ class AlertService:
     ) -> dict[str, Any]:
         started_at = time.perf_counter()
         detection_metadata = detection_metadata or {}
-        label = str(prediction.get("label", "Unknown"))
-        confidence = float(prediction.get("confidence", 0.0))
+        candidate = self._primary_detection(prediction)
+        label = normalize_label(str(candidate.get("display_label", candidate.get("final_label", candidate.get("label", prediction.get("label", "Unknown"))))))
+        final_label = normalize_label(str(candidate.get("final_label", label)))
+        confidence = float(candidate.get("final_confidence", candidate.get("confidence", prediction.get("confidence", 0.0))))
+        prediction_for_snapshot = dict(prediction)
+        if candidate.get("bbox"):
+            prediction_for_snapshot["bbox"] = candidate["bbox"]
         camera_id = camera_id or str(self.config.get("camera_id", "CAM_01"))
         camera_location = camera_location or str(self.config.get("camera_location", "Village Border Camera"))
 
@@ -169,7 +178,7 @@ class AlertService:
 
         with self._lock:
             state = self._states.setdefault(camera_id, CameraAlertState())
-            animal_severity = self.severity_for_animal(label)
+            animal_severity = self.severity_for_animal(final_label)
             if animal_severity == "LOW":
                 state.last_animal = None
                 state.repeat_count = 0
@@ -202,10 +211,10 @@ class AlertService:
                     }
                 )
 
-            if _normalize_name(label) == _normalize_name(state.last_animal or ""):
+            if _normalize_name(final_label) == _normalize_name(state.last_animal or ""):
                 state.repeat_count += 1
             else:
-                state.last_animal = label
+                state.last_animal = final_label
                 state.repeat_count = 1
 
             if state.repeat_count < required:
@@ -238,12 +247,13 @@ class AlertService:
 
             severity = animal_severity
             timestamp = iso_timestamp()
-            snapshot_path = self.snapshot_service.save_snapshot(frame, label, confidence, source_type) if frame is not None else ""
+            message = self._message_from_template(label, confidence, camera_location, timestamp, detection_metadata)
+            snapshot_path = self.snapshot_service.save_snapshot(frame, label, confidence, source_type, prediction_for_snapshot) if frame is not None else ""
             clip_path = ""
             if self.clip_service is not None and frame is not None:
                 clip_path = self.clip_service.start_alert_clip(camera_id, label, confidence, source_type)
 
-            detection_region = estimate_detection_region(frame, prediction) if frame is not None else {}
+            detection_region = estimate_detection_region(frame, prediction_for_snapshot) if frame is not None else {}
             siren_status = self.siren_service.trigger(severity) if self.siren_service is not None else "Siren unavailable."
 
             event = {
@@ -251,6 +261,11 @@ class AlertService:
                 "camera_id": camera_id,
                 "camera_location": camera_location,
                 "animal": label,
+                "display_label": label,
+                "final_label": final_label,
+                "raw_classifier_label": candidate.get("raw_classifier_label", prediction.get("raw_classifier_label", "")),
+                "normalized_classifier_label": candidate.get("normalized_classifier_label", prediction.get("normalized_classifier_label", "")),
+                "yolo_label": candidate.get("yolo_label", ""),
                 "confidence": confidence,
                 "threat_level": "DANGER",
                 "severity": severity,
@@ -261,12 +276,14 @@ class AlertService:
                 "video_filename": str(source_path).replace("\\", "/").split("/")[-1],
                 "ai_interval": str(detection_metadata.get("ai_interval", "")),
                 "reason": "Dangerous animal confirmed",
+                "message": message,
                 "processing_time_ms": float(detection_metadata.get("processing_time_ms", 0.0) or 0.0),
                 "detection_video_timestamp": str(detection_metadata.get("detection_video_timestamp", "")),
                 "detection_frame_number": int(detection_metadata.get("detection_frame_number", detection_metadata.get("frame_index", 0)) or 0),
                 "playback_fps": float(detection_metadata.get("playback_fps", 0.0) or 0.0),
                 "detection_region": detection_region,
                 "location_note": detection_region.get("note", "Location: detected in current frame. Bounding box requires detection model."),
+                "detections": prediction.get("detections", []),
                 "siren_status": siren_status,
             }
 
@@ -275,10 +292,20 @@ class AlertService:
             event["notification_status"] = self._notification_summary(notification_results)
             event["notification_summary"] = self._notification_message(notification_results)
             event["notification_sent"] = bool(notification_results)
+            event["last_sms_time"] = self._last_sms_time(notification_results)
+            event["cooldown_remaining"] = int(self.config.get("alert_cooldown_seconds", 120))
 
             events = self.load_events()
             events.append(event)
             save_json(self.events_path, events)
+            self.logger.warning(
+                "Alert triggered: animal=%s confidence=%.3f camera=%s severity=%s snapshot=%s",
+                label,
+                confidence,
+                camera_id,
+                severity,
+                snapshot_path,
+            )
 
             state.last_alert_time = now
             state.repeat_count = 0
@@ -320,3 +347,46 @@ class AlertService:
         if disabled:
             return "Real SMS disabled. Enable data/sms_config.json."
         return str(results[0].get("status", "unknown"))
+
+    def _last_sms_time(self, results: list[dict[str, Any]]) -> str:
+        sent = [row for row in results if row.get("status") == "sent"]
+        if sent:
+            return str(sent[-1].get("timestamp", "--"))
+        return "--"
+
+    def _primary_detection(self, prediction: dict[str, Any]) -> dict[str, Any]:
+        detections = prediction.get("detections")
+        if isinstance(detections, list) and detections:
+            normalized_dangerous = {_normalize_name(name) for name in self.config.get("dangerous_animals", [])}
+            valid = [item for item in detections if isinstance(item, dict)]
+            dangerous = [item for item in valid if _normalize_name(str(item.get("final_label", item.get("display_label", "")))) in normalized_dangerous]
+            candidates = dangerous or valid
+            if candidates:
+                return max(candidates, key=lambda item: float(item.get("final_confidence", 0.0) or 0.0))
+        return prediction
+
+    def cooldown_remaining(self, camera_id: str | None = None) -> int:
+        camera_id = camera_id or str(self.config.get("camera_id", "CAM_01"))
+        state = self._states.get(camera_id)
+        if not state or state.last_alert_time is None:
+            return 0
+        cooldown = max(0, int(self.config.get("alert_cooldown_seconds", 120)))
+        elapsed = (datetime.now().astimezone() - state.last_alert_time).total_seconds()
+        return max(0, int(cooldown - elapsed))
+
+    def _message_from_template(
+        self,
+        animal: str,
+        confidence: float,
+        camera_location: str,
+        timestamp: str,
+        detection_metadata: dict[str, Any],
+    ) -> str:
+        template = str(self.config.get("message_template", DEFAULT_ALERT_CONFIG["message_template"]))
+        video_time = str(detection_metadata.get("detection_video_timestamp", ""))
+        return template.format(
+            animal=animal,
+            camera_location=camera_location,
+            confidence=round(confidence * 100),
+            timestamp=video_time or timestamp,
+        )

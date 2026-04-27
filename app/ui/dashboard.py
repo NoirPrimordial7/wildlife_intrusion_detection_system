@@ -15,6 +15,7 @@ from app.core.alert_service import AlertService
 from app.core.camera_service import CameraService
 from app.core.clip_service import ClipService
 from app.core.detection_localizer import draw_detection_overlay
+from app.core.hybrid_detector import HybridDetector
 from app.core.notification_service import NotificationService
 from app.core.prediction_service import PredictionService
 from app.core.report_service import ReportService
@@ -24,6 +25,7 @@ from app.core.video_service import VideoService
 from app.ui.alert_history_panel import AlertHistoryPanel
 from app.ui.camera_panel import CameraPanel
 from app.ui.evidence_panel import EvidencePanel
+from app.ui.notification_log_panel import NotificationLogPanel
 from app.ui.settings_panel import SettingsPanel
 from app.ui.sidebar import Sidebar
 from app.ui.theme import COLORS
@@ -43,6 +45,7 @@ class Dashboard(ctk.CTk):
         self.configure(fg_color=COLORS["app_bg"])
 
         self.prediction_service = PredictionService()
+        self.detector_service = HybridDetector(self.prediction_service)
         self.notification_service = NotificationService()
         self.snapshot_service = SnapshotService()
         self.clip_service = ClipService()
@@ -56,14 +59,14 @@ class Dashboard(ctk.CTk):
         self.report_service = ReportService()
 
         self.camera_service = CameraService(
-            self.prediction_service,
+            self.detector_service,
             self._on_frame_from_worker,
             self._on_prediction_from_worker,
             self._on_error_from_worker,
             self._on_camera_status_from_worker,
         )
         self.video_service = VideoService(
-            self.prediction_service,
+            self.detector_service,
             self._on_frame_from_worker,
             self._on_prediction_from_worker,
             self._on_video_progress_from_worker,
@@ -72,6 +75,8 @@ class Dashboard(ctk.CTk):
 
         self._source_type = "idle"
         self._source_path = ""
+        self._last_stable_prediction: dict[str, Any] | None = None
+        self._last_decision: dict[str, Any] | None = None
         self._build_layout()
         self._refresh_static_state()
         self.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -120,7 +125,13 @@ class Dashboard(ctk.CTk):
         self.threat_panel = ThreatPanel(self.right_panel)
         self.threat_panel.grid(row=0, column=0, sticky="ew")
 
-        self.evidence_panel = EvidencePanel(self.right_panel, self.open_project_file)
+        self.evidence_panel = EvidencePanel(
+            self.right_panel,
+            self.open_project_file,
+            self.export_report,
+            self.focus_settings,
+            self.acknowledge_alert,
+        )
         self.evidence_panel.grid(row=1, column=0, sticky="ew", pady=(0, 12))
 
         self.alert_history_panel = AlertHistoryPanel(self.right_panel, self.open_project_file)
@@ -131,11 +142,21 @@ class Dashboard(ctk.CTk):
             self.alert_service.config,
             self.save_settings,
             self.stop_alarm,
-            self.notification_service.load_registered_users(),
+            self.notification_service.users_with_last_status(),
             self.save_registered_users,
             self.test_sms_user,
+            self.notification_service.load_sms_config(),
+            self.save_sms_config,
+            self.refresh_notification_views,
         )
         self.settings_panel.grid(row=3, column=0, sticky="ew")
+
+        self.notification_log_panel = NotificationLogPanel(
+            self.right_panel,
+            self.clear_notification_log,
+            self.export_notification_log,
+        )
+        self.notification_log_panel.grid(row=4, column=0, sticky="ew", pady=(0, 12))
 
     def _refresh_static_state(self) -> None:
         config = self.alert_service.config
@@ -298,7 +319,19 @@ class Dashboard(ctk.CTk):
         except Exception as exc:
             self._show_error(f"Registered users could not be saved: {exc}")
 
+    def save_sms_config(self, updates: dict[str, Any]) -> None:
+        try:
+            self.notification_service.save_sms_config(updates)
+            self.refresh_notification_views()
+            messagebox.showinfo("SMS settings saved", "Notification settings updated.")
+        except Exception as exc:
+            self._show_error(f"SMS settings could not be saved: {exc}")
+
     def test_sms_user(self, user: dict[str, Any]) -> None:
+        if not self.notification_service.load_sms_config().get("enabled"):
+            messagebox.showwarning("SMS disabled", "Real SMS is disabled. No test SMS was sent.")
+            self.refresh_notification_views()
+            return
         result = self.notification_service.send_test_sms(user)
         self.threat_panel.update_sms_status(self.notification_service.sms_status())
         status = result.get("status", "unknown")
@@ -313,10 +346,26 @@ class Dashboard(ctk.CTk):
     def stop_alarm(self) -> None:
         self.siren_service.stop()
 
+    def acknowledge_alert(self) -> None:
+        self.threat_panel.update_threat("LOW", "Alert acknowledged")
+
+    def refresh_notification_views(self) -> None:
+        self.threat_panel.update_sms_status(self.notification_service.sms_status())
+        if hasattr(self, "notification_log_panel"):
+            self.notification_log_panel.update_logs(self.notification_service.load_notification_log())
+
+    def clear_notification_log(self) -> None:
+        self.notification_service.clear_notification_log()
+        self.refresh_notification_views()
+
+    def export_notification_log(self) -> None:
+        path = self.notification_service.export_notification_log()
+        messagebox.showinfo("Notification log exported", f"Notification log saved to:\n{path}")
+
     def _predict_image_worker(self, frame: Any, path: str) -> None:
         try:
             started_at = time.perf_counter()
-            prediction = self.prediction_service.predict_frame(frame.copy())
+            prediction = self.detector_service.predict_frame(frame.copy())
             processing_time_ms = round((time.perf_counter() - started_at) * 1000, 2)
             metadata = {
                 "source_type": "image",
@@ -362,11 +411,11 @@ class Dashboard(ctk.CTk):
         ai_interval = metadata.get("ai_interval", self.video_service.interval_label)
         threat_level = decision.get("threat_level", "LOW")
 
-        if threat_level in {"DANGER", "HIGH", "CRITICAL", "WARNING"} and decision.get("severity") != "LOW":
+        if prediction.get("detections") or (threat_level in {"DANGER", "HIGH", "CRITICAL", "WARNING"} and decision.get("severity") != "LOW"):
             self.camera_panel.set_frame(draw_detection_overlay(frame, prediction, str(threat_level)))
 
         self.camera_panel.set_status(
-            animal=prediction.get("label", "--"),
+            animal=prediction.get("display_label", prediction.get("label", "--")),
             confidence=float(prediction.get("confidence", 0.0)),
             threat_level=str(threat_level),
             ai_interval=ai_interval,
@@ -382,12 +431,26 @@ class Dashboard(ctk.CTk):
 
         reason = str(decision.get("reason", ""))
         if threat_level in {"DANGER", "HIGH", "CRITICAL", "WARNING"} and decision.get("severity") != "LOW":
-            reason = f"{reason}\nLocation: detected in current frame. Bounding box requires detection model."
-        self.threat_panel.update_threat(str(threat_level), reason)
+            event = decision.get("event") or {}
+            location_note = event.get("location_note", "Location: YOLO bounding box around detected animal." if prediction.get("bbox") else "Location: detected in current frame. Bounding box requires detection model.")
+            reason = f"{reason}\n{location_note}"
+        self.threat_panel.update_threat(
+            str(threat_level),
+            reason,
+            int(decision.get("repeat_count", 0) or 0),
+            int(self.alert_service.config.get("required_repeated_detections", 3)),
+        )
         self.threat_panel.update_detection(prediction)
         self.threat_panel.update_camera_info(self.alert_service.config, source_type, source_path)
         self._refresh_alert_views()
         self.threat_panel.update_sms_status(self.notification_service.sms_status())
+        self.refresh_notification_views()
+        self._last_stable_prediction = prediction
+        self._last_decision = decision
+        self.camera_panel.set_monitoring_status(
+            sms_status="Enabled" if self.notification_service.sms_status().get("enabled") else "Disabled",
+            cooldown_remaining=f"{self.alert_service.cooldown_remaining()} sec",
+        )
 
         if decision.get("alert_triggered") and decision.get("event"):
             self._show_alert_popup(decision["event"])
@@ -424,8 +487,7 @@ class Dashboard(ctk.CTk):
         body = ctk.CTkLabel(
             popup,
             text=(
-                f"{event.get('animal', 'Unknown')} detected near "
-                f"{event.get('camera_location', 'camera')}.\n"
+                f"{event.get('message', '')}\n"
                 f"Confidence: {float(event.get('confidence', 0.0)):.1%}\n"
                 f"Video time: {event.get('detection_video_timestamp', '--')}\n"
                 f"Snapshot: {event.get('snapshot_path', '')}\n"
@@ -451,9 +513,13 @@ class Dashboard(ctk.CTk):
     def _refresh_alert_views(self) -> None:
         events = self.alert_service.load_events()
         recent = list(reversed(events[-6:]))
+        for event in recent:
+            event["cooldown_remaining"] = self.alert_service.cooldown_remaining(str(event.get("camera_id", "CAM_01")))
         self.alert_history_panel.update_events(recent, len(events))
         if hasattr(self, "evidence_panel"):
             self.evidence_panel.update_events(recent)
+        if hasattr(self, "notification_log_panel"):
+            self.notification_log_panel.update_logs(self.notification_service.load_notification_log())
 
     def _on_close(self) -> None:
         self.camera_service.stop(wait=False)

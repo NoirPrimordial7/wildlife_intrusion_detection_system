@@ -40,24 +40,20 @@ class CameraPanel(ctk.CTkFrame):
         )
         self.preview_label.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
 
-        self.status_box = ctk.CTkFrame(self.preview_area, fg_color=COLORS["surface"], corner_radius=8)
+        self.status_box = ctk.CTkFrame(self.preview_area, fg_color="#151a22", corner_radius=6)
         self.status_box.place(relx=0.02, rely=0.03)
 
         self.detected_label = self._status_label("Detected: --", 0)
         self.confidence_label = self._status_label("Confidence: --", 1)
         self.threat_label = self._status_label("Threat: SAFE", 2, bold=True)
-        self.interval_label = self._status_label("AI interval: Every 1 sec", 3)
-        self.source_label = self._status_label("Source: idle", 4)
-        self.stream_label = self._status_label("Stream: idle", 5)
-        self.processing_label = self._status_label("AI processing time: --", 6)
-        self.decision_label = self._status_label("Alert decision time: --", 7)
-        self.latency_label = self._status_label("Detection latency: --", 8)
-        self.fps_label = self._status_label("Playback FPS: --", 9)
+        self.processing_label = self._status_label("AI: --", 3)
+        self.frame_label = self._status_label("Frame: --", 4)
 
         self.controls = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=8)
         self.controls.grid(row=1, column=0, sticky="ew", padx=18, pady=(0, 18))
         self.controls.grid_columnconfigure(9, weight=1)
         self._build_video_controls()
+        self._build_bottom_status()
         self.show_video_controls(False)
 
     def _status_label(self, text: str, row: int, bold: bool = False) -> ctk.CTkLabel:
@@ -65,10 +61,10 @@ class CameraPanel(ctk.CTkFrame):
             self.status_box,
             text=text,
             text_color=COLORS["text"],
-            font=ctk.CTkFont(size=13, weight="bold" if bold else "normal"),
+            font=ctk.CTkFont(size=12, weight="bold" if bold else "normal"),
             anchor="w",
         )
-        label.grid(row=row, column=0, sticky="ew", padx=14, pady=(10 if row == 0 else 2, 10 if row == 9 else 2))
+        label.grid(row=row, column=0, sticky="ew", padx=10, pady=(7 if row == 0 else 1, 7 if row == 4 else 1))
         return label
 
     def _build_video_controls(self) -> None:
@@ -125,6 +121,22 @@ class CameraPanel(ctk.CTkFrame):
         self.timeline.set(0)
         self.timeline.grid(row=1, column=0, columnspan=10, sticky="ew", padx=12, pady=(0, 12))
 
+    def _build_bottom_status(self) -> None:
+        self.bottom_status = ctk.CTkFrame(self.preview_area, fg_color="#151a22", corner_radius=6)
+        self.bottom_status.place(relx=0.015, rely=0.94, relwidth=0.97, anchor="sw")
+        self.bottom_status.grid_columnconfigure((0, 1, 2, 3, 4, 5), weight=1)
+        self.mode_label = self._bottom_label(0, "Mode: Hybrid YOLO + Classifier")
+        self.monitoring_label = self._bottom_label(1, "AI Monitoring: idle")
+        self.next_check_label = self._bottom_label(2, "Next: --")
+        self.fps_label = self._bottom_label(3, "FPS: --")
+        self.sms_label = self._bottom_label(4, "SMS: Disabled")
+        self.cooldown_label = self._bottom_label(5, "Cooldown: --")
+
+    def _bottom_label(self, column: int, text: str) -> ctk.CTkLabel:
+        label = ctk.CTkLabel(self.bottom_status, text=text, text_color=COLORS["muted"], font=ctk.CTkFont(size=12), anchor="w")
+        label.grid(row=0, column=column, sticky="ew", padx=8, pady=6)
+        return label
+
     def _on_speed_change(self, value: str) -> None:
         numeric = float(value.replace("x", ""))
         callback = self.video_callbacks.get("speed")
@@ -178,11 +190,11 @@ class CameraPanel(ctk.CTkFrame):
                 text_color=threat_color(threat_level),
             )
         if ai_interval is not None:
-            self.interval_label.configure(text=f"AI interval: {ai_interval}")
+            pass
         if source_type is not None:
-            self.source_label.configure(text=f"Source: {source_type}")
+            pass
         if stream_state is not None:
-            self.stream_label.configure(text=f"Stream: {stream_state}")
+            self.monitoring_label.configure(text=f"AI Monitoring: {stream_state}")
 
     def set_metrics(
         self,
@@ -192,13 +204,21 @@ class CameraPanel(ctk.CTkFrame):
         playback_fps: float | None = None,
     ) -> None:
         if processing_time_ms is not None:
-            self.processing_label.configure(text=f"AI processing time: {processing_time_ms:.0f} ms")
-        if alert_decision_time_ms is not None:
-            self.decision_label.configure(text=f"Alert decision time: {alert_decision_time_ms:.0f} ms")
+            self.processing_label.configure(text=f"AI: {processing_time_ms:.0f} ms")
         if detection_latency is not None:
-            self.latency_label.configure(text=f"Detection latency: {detection_latency}")
+            pass
         if playback_fps is not None:
-            self.fps_label.configure(text=f"Playback FPS: {playback_fps:.1f}")
+            self.fps_label.configure(text=f"FPS: {playback_fps:.1f}")
+
+    def set_monitoring_status(self, monitoring_state: str = "", next_check_in: str = "", last_checked_frame: str = "", last_checked_time: str = "", sms_status: str = "Disabled", cooldown_remaining: str = "--") -> None:
+        if monitoring_state:
+            self.monitoring_label.configure(text=monitoring_state)
+        if next_check_in:
+            self.next_check_label.configure(text=f"Next: {next_check_in}")
+        if last_checked_frame or last_checked_time:
+            self.frame_label.configure(text=f"Frame: {last_checked_frame} @ {last_checked_time}")
+        self.sms_label.configure(text=f"SMS: {sms_status}")
+        self.cooldown_label.configure(text=f"Cooldown: {cooldown_remaining}")
 
     def set_progress(self, progress: dict[str, Any]) -> None:
         current = format_seconds(progress.get("current_second", 0))
@@ -208,6 +228,12 @@ class CameraPanel(ctk.CTkFrame):
         self.time_label.configure(text=f"{current} / {duration} | Frame {frame_index}/{frame_count}")
         if progress.get("playback_fps") is not None:
             self.set_metrics(playback_fps=float(progress.get("playback_fps", 0.0)))
+        self.set_monitoring_status(
+            monitoring_state="AI Monitoring Active",
+            next_check_in=str(progress.get("next_check_in", "--")),
+            last_checked_frame=str(progress.get("last_checked_frame", "--")),
+            last_checked_time=str(progress.get("last_checked_time", "--")),
+        )
         self._updating_slider = True
         self.timeline.set(float(progress.get("percent", 0.0)))
         self._updating_slider = False

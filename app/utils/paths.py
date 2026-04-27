@@ -11,6 +11,8 @@ PROJECT_ROOT = APP_DIR.parent
 MODELS_DIR = PROJECT_ROOT / "models"
 DATA_DIR = PROJECT_ROOT / "data"
 ASSETS_DIR = PROJECT_ROOT / "assets"
+LOGS_DIR = PROJECT_ROOT / "logs"
+DOCS_DIR = PROJECT_ROOT / "docs"
 ALERTS_DIR = ASSETS_DIR / "alerts"
 CLIPS_DIR = ALERTS_DIR / "clips"
 REPORTS_DIR = ASSETS_DIR / "reports"
@@ -22,6 +24,7 @@ MODEL_PATH = MODELS_DIR / "animal_classification_model_final.h5"
 CLASS_NAMES_PATH = DATA_DIR / "class_names.json"
 ANIMAL_INFO_PATH = DATA_DIR / "animal_info.json"
 ALERT_CONFIG_PATH = DATA_DIR / "alert_config.json"
+DETECTION_CONFIG_PATH = DATA_DIR / "detection_config.json"
 ALERT_EVENTS_PATH = DATA_DIR / "alert_events.json"
 API_CONFIG_PATH = DATA_DIR / "api_config.json"
 SYSTEM_CONFIG_PATH = DATA_DIR / "system_config.json"
@@ -43,6 +46,8 @@ def ensure_project_dirs() -> None:
         TEST_IMAGES_DIR,
         TEST_VIDEOS_DIR,
         REFERENCE_IMAGES_DIR,
+        LOGS_DIR,
+        DOCS_DIR,
     ):
         path.mkdir(parents=True, exist_ok=True)
 
@@ -51,7 +56,7 @@ def load_json(path: Path, default: Any) -> Any:
     if not path.exists():
         return default
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8-sig"))
     except json.JSONDecodeError:
         return default
 

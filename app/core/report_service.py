@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 
-from app.utils.paths import ALERT_CONFIG_PATH, ALERT_EVENTS_PATH, REGISTERED_USERS_PATH, REPORTS_DIR, load_json, relative_to_project
+from app.utils.paths import ALERT_CONFIG_PATH, ALERT_EVENTS_PATH, DETECTION_CONFIG_PATH, REGISTERED_USERS_PATH, REPORTS_DIR, load_json, relative_to_project
 from app.utils.time_utils import file_timestamp
 
 
@@ -23,6 +23,9 @@ class ReportService:
         registered_users = load_json(REGISTERED_USERS_PATH, [])
         if not isinstance(registered_users, list):
             registered_users = []
+        detection_config = load_json(DETECTION_CONFIG_PATH, {})
+        if not isinstance(detection_config, dict):
+            detection_config = {}
 
         animal_counts = Counter(str(event.get("animal", "Unknown")) for event in events)
         latest_event = events[-1] if events else {}
@@ -36,6 +39,8 @@ class ReportService:
             "",
             f"Video filename: {latest_event.get('video_filename', '--')}",
             f"Detection interval: {latest_event.get('ai_interval', config.get('detection_interval', '--'))}",
+            f"Detection mode: {detection_config.get('mode', 'hybrid')}",
+            f"YOLO model: {detection_config.get('yolo_model', 'yolov8n.pt')}",
             f"Confidence threshold: {float(config.get('confidence_threshold', 0.0)):.0%}",
             f"Registered users count: {len(registered_users)}",
             f"Dangerous animal list: {', '.join(str(name) for name in dangerous_animals)}",
@@ -58,6 +63,10 @@ class ReportService:
                     f"  Video time: {event.get('detection_video_timestamp', '--')}",
                     f"  Frame number: {event.get('detection_frame_number', '--')}",
                     f"  Animal: {event.get('animal', 'Unknown')}",
+                    f"  Display label: {event.get('display_label', event.get('animal', 'Unknown'))}",
+                    f"  Raw classifier label: {event.get('raw_classifier_label', '--')}",
+                    f"  Normalized classifier label: {event.get('normalized_classifier_label', '--')}",
+                    f"  YOLO label: {event.get('yolo_label', '--')}",
                     f"  Confidence: {float(event.get('confidence', 0.0)):.0%}",
                     f"  Severity: {event.get('severity', event.get('threat_level', ''))}",
                     f"  AI processing time: {float(event.get('processing_time_ms', 0.0)):.2f} ms",

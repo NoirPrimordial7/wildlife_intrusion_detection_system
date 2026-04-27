@@ -32,12 +32,15 @@ class ThreatPanel(ctk.CTkFrame):
             justify="left",
         )
         self.reason_label.grid(row=2, column=0, sticky="ew", padx=16, pady=(0, 14))
+        self.repeat_label = self._line(self.threat_card, 3, "Detection count: 0/3")
 
         self.detection_card = self._card(1, "Current Detection")
         self.animal_label = self._line(self.detection_card, 1, "Animal: --")
         self.confidence_label = self._line(self.detection_card, 2, "Confidence: --")
-        self.info_label = self._line(self.detection_card, 3, "Habitat: --")
-        self.top_labels = [self._line(self.detection_card, row, "--") for row in range(4, 9)]
+        self.yolo_label = self._line(self.detection_card, 3, "YOLO: --")
+        self.classifier_label = self._line(self.detection_card, 4, "Classifier: --")
+        self.processing_label = self._line(self.detection_card, 5, "Processing: --")
+        self.mode_label = self._line(self.detection_card, 6, "Detection Mode: Hybrid YOLO + Classifier")
 
         self.camera_card = self._card(2, "Camera Info")
         self.camera_id_label = self._line(self.camera_card, 1, "Camera ID: CAM_01")
@@ -49,6 +52,7 @@ class ThreatPanel(ctk.CTkFrame):
         self.sms_provider_label = self._line(self.sms_card, 2, "SMS Provider: Twilio")
         self.sms_users_label = self._line(self.sms_card, 3, "Registered users: 0")
         self.sms_last_label = self._line(self.sms_card, 4, "Last notification: --")
+        self.sms_hint_label = self._line(self.sms_card, 5, "Open SMS Settings from Video Evidence")
 
     def _card(self, row: int, title: str) -> ctk.CTkFrame:
         frame = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=8)
@@ -77,28 +81,37 @@ class ThreatPanel(ctk.CTkFrame):
         label.grid(row=row, column=0, sticky="ew", padx=16, pady=(2, 12 if row >= 8 else 2))
         return label
 
-    def update_threat(self, level: str, reason: str) -> None:
+    def update_threat(self, level: str, reason: str, repeat_count: int | None = None, required_count: int | None = None) -> None:
         level = (level or "SAFE").upper()
         self.threat_value.configure(text=level, text_color=threat_color(level))
         self.reason_label.configure(text=reason or "")
+        if repeat_count is not None and required_count is not None:
+            self.repeat_label.configure(text=f"Detection count: {repeat_count}/{required_count}")
 
     def update_detection(self, prediction: dict[str, Any]) -> None:
-        animal = prediction.get("label", "--")
+        animal = prediction.get("display_label", prediction.get("label", "--"))
         confidence = float(prediction.get("confidence", 0.0))
-        info = prediction.get("animal_info") or {}
-        habitat = info.get("HABITAT") or info.get("habitat") or "--"
-
         self.animal_label.configure(text=f"Animal: {animal}")
         self.confidence_label.configure(text=f"Confidence: {confidence:.1%}")
-        self.info_label.configure(text=f"Habitat: {habitat}")
+        primary = self._primary_detection(prediction)
+        if primary:
+            self.yolo_label.configure(text=f"YOLO: {primary.get('yolo_label', '--')} {float(primary.get('yolo_confidence', 0.0)):.1%}")
+            self.classifier_label.configure(
+                text=f"Classifier: {primary.get('normalized_classifier_label', '--')} {float(primary.get('classifier_confidence', 0.0)):.1%}"
+            )
+        else:
+            self.yolo_label.configure(text="YOLO: --")
+            raw = prediction.get("normalized_classifier_label", "--")
+            self.classifier_label.configure(text=f"Classifier: {raw}")
+        self.processing_label.configure(text=f"Processing: {float(prediction.get('processing_time_ms', 0.0)):.0f} ms")
 
-        top_predictions = prediction.get("top_predictions") or []
-        for index, label in enumerate(self.top_labels):
-            if index < len(top_predictions):
-                row = top_predictions[index]
-                label.configure(text=f"{index + 1}. {row.get('label', '--')} - {float(row.get('confidence', 0.0)):.1%}")
-            else:
-                label.configure(text="--")
+    def _primary_detection(self, prediction: dict[str, Any]) -> dict[str, Any]:
+        detections = prediction.get("detections")
+        if isinstance(detections, list) and detections:
+            valid = [item for item in detections if isinstance(item, dict)]
+            dangerous = [item for item in valid if item.get("is_dangerous")]
+            return max(dangerous or valid, key=lambda item: float(item.get("final_confidence", 0.0) or 0.0))
+        return {}
 
     def update_camera_info(self, config: dict[str, Any], source_type: str, source_path: str = "") -> None:
         self.camera_id_label.configure(text=f"Camera ID: {config.get('camera_id', 'CAM_01')}")

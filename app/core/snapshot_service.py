@@ -5,6 +5,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+from app.core.detection_localizer import draw_detection_overlay
 from app.utils.image_utils import safe_filename_part
 from app.utils.paths import ALERTS_DIR, relative_to_project
 from app.utils.time_utils import file_timestamp
@@ -15,9 +16,18 @@ class SnapshotService:
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def save_snapshot(self, frame: np.ndarray, animal: str, confidence: float, source_type: str) -> str:
+    def save_snapshot(
+        self,
+        frame: np.ndarray,
+        animal: str,
+        confidence: float,
+        source_type: str,
+        prediction: dict | None = None,
+    ) -> str:
         if frame is None:
             return ""
+        if prediction:
+            frame = draw_detection_overlay(frame, prediction, "DANGER")
         animal_part = safe_filename_part(animal)
         source_part = safe_filename_part(source_type or "source")
         filename = f"{file_timestamp()}_{source_part}_{animal_part}_{confidence:.2f}.jpg"
@@ -26,4 +36,3 @@ class SnapshotService:
         if not ok:
             raise IOError(f"Failed to save alert snapshot: {path}")
         return relative_to_project(path)
-

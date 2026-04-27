@@ -66,6 +66,8 @@ class VideoService:
         self._last_prediction_second = -9999.0
         self._last_frame_at: float | None = None
         self._playback_fps = 0.0
+        self._last_checked_frame: int | None = None
+        self._last_checked_time = "--"
 
     @property
     def is_running(self) -> bool:
@@ -200,6 +202,8 @@ class VideoService:
 
                 if self._should_predict(self.current_frame_index):
                     try:
+                        self._last_checked_frame = self.current_frame_index
+                        self._last_checked_time = format_video_timestamp(metadata.get("current_second", 0.0))
                         prediction_started_at = time.perf_counter()
                         prediction = self.prediction_service.predict_frame(frame.copy())
                         prediction_finished_at = time.perf_counter()
@@ -240,6 +244,7 @@ class VideoService:
 
     def _metadata(self) -> dict[str, Any]:
         current_second = self.current_frame_index / max(self.fps, 1.0)
+        next_check = self._next_check_label(self.current_frame_index)
         return {
             "source_type": "video",
             "source_path": self.video_path or "",
@@ -249,6 +254,10 @@ class VideoService:
             "detection_frame_number": self.current_frame_index,
             "ai_interval": self.interval_label,
             "playback_fps": round(self._playback_fps, 2),
+            "ai_monitoring_state": "AI Monitoring Active" if self._running and not self.is_paused else "AI Monitoring Paused" if self.is_paused else "AI Monitoring Idle",
+            "next_check_in": next_check,
+            "last_checked_frame": self._last_checked_frame if self._last_checked_frame is not None else "--",
+            "last_checked_time": self._last_checked_time,
         }
 
     def _emit_progress(self) -> None:
@@ -265,6 +274,9 @@ class VideoService:
                 "fps": self.fps,
                 "playback_fps": round(self._playback_fps, 2),
                 "speed": self.speed,
+                "next_check_in": self._next_check_label(self.current_frame_index),
+                "last_checked_frame": self._last_checked_frame if self._last_checked_frame is not None else "--",
+                "last_checked_time": self._last_checked_time,
             }
         )
 
@@ -281,3 +293,17 @@ class VideoService:
             self.current_frame_index = max(0, frame_index)
             self.frame_callback(frame.copy(), self._metadata())
             self._emit_progress()
+
+    def _next_check_label(self, frame_index: int) -> str:
+        with self._lock:
+            label = self.interval_label
+        mode, value = DETECTION_INTERVALS.get(label, ("frames", 16))
+        if mode == "frames":
+            interval = max(1, int(value))
+            remaining = (interval - (frame_index % interval)) % interval
+            if remaining == 0:
+                remaining = interval
+            return f"{remaining} frames"
+        current_second = frame_index / max(self.fps, 1.0)
+        remaining_seconds = max(0.0, float(value) - (current_second - self._last_prediction_second))
+        return f"{remaining_seconds:.1f} sec"
