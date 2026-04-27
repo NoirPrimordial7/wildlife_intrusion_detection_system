@@ -292,6 +292,27 @@ docs/FRESH_WINDOWS_SETUP.md
 
 SMS remains disabled by default. `data/sms_config.json` is ignored by Git and should not be committed.
 
+## Fresh macOS Setup
+
+On a brand-new Mac, use:
+
+```bash
+chmod +x install_macos.sh
+./install_macos.sh
+```
+
+This checks or installs Xcode Command Line Tools, Homebrew, Git, Python 3.10, Python packages, YOLOv8n weights, and creates a launcher:
+
+```text
+Run_VanRakshak.command
+```
+
+Full instructions are in:
+
+```text
+docs/FRESH_MACOS_SETUP.md
+```
+
 ## Demo Detection Flow
 
 1. Upload a video.
