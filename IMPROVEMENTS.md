@@ -26,3 +26,5 @@ Verified on Windows with Python 3.12.10:
 No real phone message or call was sent. End-to-end delivery needs the owner's configured provider account and recipient phone. A physical webcam and macOS/Linux launch were not verified here. The guided demo is a UI walkthrough; it does not measure AI accuracy. Detection accuracy remains limited by the original model and broad YOLO classes.
 
 See [Twilio's call API](https://www.twilio.com/docs/voice/api/call-resource) for voice-call request semantics. YOLO weights in the ZIP come from the [Ultralytics assets release](https://github.com/ultralytics/assets/releases/tag/v8.4.0).
+
+Fresh-PC Windows setup now uses `SETUP.bat`: compatible Python discovery, automatic Python/runtime installation when missing, signed-download fallback, package/model verification, retryable failures, logs, and a desktop shortcut. The prerequisite-check mode and installer branches were verified; a blank Windows installation was not available for end-to-end testing.

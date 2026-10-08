@@ -1,57 +1,27 @@
-# Fresh Windows PC Setup
+# Fresh Windows PC setup
 
-Use this on a brand-new Windows 10/11 64-bit PC.
+Download the project ZIP from GitHub and extract the **entire folder** to a permanent location. Double-click **SETUP.bat**. Keep the internet connected until it says **Setup complete**.
 
-## What It Installs Or Checks
-
-- Git
-- Python 3.10
-- Python virtual environment
-- TensorFlow, OpenCV, CustomTkinter, Ultralytics YOLO, Twilio, Requests
-- YOLOv8n weights for offline demo after setup
-- Desktop shortcut for launching the app
-
-The installer does not create or commit SMS secrets. `data/sms_config.json` is ignored by Git and SMS stays disabled by default.
-
-## Steps
-
-1. Download or clone the project.
-2. Open the project folder.
-3. Double-click:
-
-```text
-install_windows_full.bat
-```
-
-4. Wait for verification to complete.
-5. Launch from the desktop shortcut:
-
-```text
-VanRakshak AI Wildlife Monitoring System
-```
-
-Or run:
+Or open PowerShell in the extracted project folder and paste:
 
 ```powershell
-.\Run_VanRakshak.bat
+.\SETUP.bat
 ```
 
-## Requirements
+Setup checks the project files, finds a compatible 64-bit Python 3.10–3.12, installs Python 3.12 if missing, checks/installs Microsoft's Visual C++ runtime, creates the local virtual environment, installs the pinned app packages, obtains YOLO weights if missing, verifies the environment and classifier, and creates a desktop shortcut. Git is not required when using a ZIP.
 
-- Windows 10/11 64-bit
-- Internet connection during setup
-- About 8 GB free disk space
-- 8 GB RAM minimum, 16 GB recommended
+For Python installation it tries [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/install) first. If WinGet is unavailable or cannot supply Python, it downloads the official [Python 3.12.10 Windows installer](https://www.python.org/downloads/release/python-31210/), the tested binary release for this project. Microsoft runtime downloads use [Microsoft's official redistribution link](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist). Downloaded installers must pass publisher-signature verification before running. Windows may request administrator approval to install the shared runtime.
 
-## If Winget Is Missing
+After setup, double-click **START.bat** or **VanRakshak Wildlife Watch** on the desktop. Click **Guided demo** for the illustrated walkthrough. SMS/calls need your own provider credentials and recipients; setup does not enable them or replace existing configuration.
 
-Install Git and Python 3.10 manually:
+Requirements: 64-bit Windows 10/11, internet during installation, enough free space for Python/TensorFlow/PyTorch (allow approximately 8 GB), and a PC capable of running those models. No webcam is needed for Guided demo or uploaded media.
 
-- Git: https://git-scm.com/download/win
-- Python 3.10: https://www.python.org/downloads/release/python-31011/
+If setup fails, read `.setup/setup.log`, correct the reported error, and rerun the same setup file. Failed installation steps stop setup; it does not report success until the environment/model checks pass. If Windows requires a restart, restart and rerun. Keep the project folder in place so the shortcut continues to work.
 
-Then run `install_windows_full.bat` again.
+Check prerequisites without installing anything:
 
-## SMS Safety
+```powershell
+.\SETUP.bat -CheckOnly
+```
 
-Real SMS is disabled by default. Configure SMS only if you have provider credentials and are ready to use trial/paid SMS credits.
+For macOS use the existing `install_macos.sh` instructions. This new installer is for Windows.

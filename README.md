@@ -300,10 +300,10 @@ On a brand-new Windows 10/11 PC, use:
 install_windows_full.bat
 ```
 
-This checks or installs Git and Python 3.10, creates `.venv`, installs all Python packages, prepares YOLOv8n weights, runs verification, and creates a desktop shortcut:
+This checks or installs compatible Python and the Windows runtime, creates `.venv`, installs all Python packages, prepares YOLOv8n weights, runs verification, and creates a desktop shortcut:
 
 ```text
-VanRakshak AI Wildlife Monitoring System
+VanRakshak Wildlife Watch
 ```
 
 Full instructions are in:

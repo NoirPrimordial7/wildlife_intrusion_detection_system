@@ -32,3 +32,5 @@ launcher_build.log
 pip_build*.log
 Run_VanRakshak.bat
 Run_VanRakshak.command
+
+.setup/

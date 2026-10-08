@@ -1,10 +1,16 @@
 # Run VanRakshak
 
-1. Install **64-bit Python 3.12** from [python.org](https://www.python.org/downloads/). Select **Add Python to PATH**. Python 3.10 and 3.11 also work.
-2. Extract the improved project ZIP.
-3. Open the extracted project folder and double-click **START.bat**.
+1. Extract the entire project ZIP.
+2. On a new Windows PC, double-click **SETUP.bat**. It checks/installs Python, the Windows runtime, app packages and models, verifies them, and creates a desktop shortcut. Keep the internet connected.
+3. Double-click **START.bat** to open the app. If compatible Python is already installed, START.bat can also set up the app packages directly.
 
-Or open PowerShell **inside the extracted project folder** and copy this:
+For first setup on a new Windows PC, open PowerShell **inside the extracted project folder** and copy this:
+
+```powershell
+.\SETUP.bat
+```
+
+After setup, launch with:
 
 ```powershell
 .\START.bat
