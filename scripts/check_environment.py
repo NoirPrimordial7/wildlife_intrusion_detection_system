@@ -23,8 +23,8 @@ def check(name: str, fn) -> bool:
 
 def check_python() -> str:
     version = sys.version_info
-    if version[:2] != (3, 10):
-        raise RuntimeError(f"Python 3.10 required, found {sys.version.split()[0]}")
+    if not (3, 10) <= version[:2] <= (3, 12):
+        raise RuntimeError(f"Python 3.10-3.12 required, found {sys.version.split()[0]}")
     return sys.version.split()[0]
 
 

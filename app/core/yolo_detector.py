@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 
 from app.utils.logging_utils import get_logger
-from app.utils.paths import DETECTION_CONFIG_PATH, load_json
+from app.utils.paths import PROJECT_ROOT, DETECTION_CONFIG_PATH, load_json
 
 
 DEFAULT_DETECTION_CONFIG = {
@@ -52,7 +52,8 @@ class YoloDetector:
             from ultralytics import YOLO
         except ImportError as exc:
             raise ImportError("Ultralytics is required for YOLO detection. Run: pip install ultralytics") from exc
-        self._model = YOLO(self.model_name)
+        local_model = PROJECT_ROOT / self.model_name
+        self._model = YOLO(str(local_model) if local_model.exists() else self.model_name)
         self.logger.info("YOLO model loaded: %s", self.model_name)
 
     def detect(self, frame: np.ndarray) -> list[dict[str, Any]]:

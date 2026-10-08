@@ -50,6 +50,11 @@ class VideoService:
         self.progress_callback = progress_callback
         self.error_callback = error_callback
 
+        self.session = 0
+        self._state = "loaded"
+        self._prediction_busy = False
+        self._prediction_thread = None
+        self._seek_generation = 0
         self.video_path: str | None = None
         self.fps = 30.0
         self.frame_count = 0
@@ -77,13 +82,19 @@ class VideoService:
     def is_paused(self) -> bool:
         return self._pause_event.is_set()
 
-    def open_video(self, video_path: str) -> None:
+    def open_video(self, video_path: str) -> bool:
         self.stop(wait=True, reset=False)
+        self.video_path = None
+        self._last_checked_frame = None
+        self._last_checked_time = "--"
+        self._playback_fps = 0
+        self._seek_frame = None
         path = str(Path(video_path).resolve())
         cap = cv2.VideoCapture(path)
         if not cap.isOpened():
+            cap.release()
             self.error_callback(f"Could not open video: {video_path}")
-            return
+            return False
         self.video_path = path
         self.fps = float(cap.get(cv2.CAP_PROP_FPS) or 30.0)
         self.frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
@@ -91,11 +102,14 @@ class VideoService:
         ok, frame = cap.read()
         cap.release()
         if not ok or frame is None:
+            self.video_path = None
             self.error_callback("Video loaded but first frame could not be read")
-            return
+            return False
         self._last_prediction_second = -9999.0
+        self._state = "loaded"
         self.frame_callback(frame.copy(), self._metadata())
         self._emit_progress()
+        return True
 
     def start(self) -> None:
         if not self.video_path:
@@ -104,23 +118,39 @@ class VideoService:
         if self._running:
             self.resume()
             return
-        self._stop_event.clear()
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=1)
+            if self._thread.is_alive():
+                self.error_callback("Video is still stopping. Try again in a moment.")
+                return
+        if self._state == "finished":
+            self.current_frame_index = 0
+        self._stop_event = threading.Event()
         self._pause_event.clear()
+        self._running = True
+        self._state = "playing"
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
 
     def pause(self) -> None:
         if self._running:
             self._pause_event.set()
+            self._state = "paused"
+            self._emit_progress()
 
     def resume(self) -> None:
-        self._pause_event.clear()
+        if self._running:
+            self._pause_event.clear()
+            self._state = "playing"
+            self._emit_progress()
 
     def stop(self, wait: bool = False, reset: bool = True) -> None:
         self._stop_event.set()
+        self._state = "stopped"
         self._pause_event.clear()
         if wait and self._thread and self._thread.is_alive():
             self._thread.join(timeout=3)
+        self._emit_progress()
         if reset:
             self.current_frame_index = 0
             self._last_prediction_second = -9999.0
@@ -159,8 +189,9 @@ class VideoService:
         with self._lock:
             self.current_frame_index = target
             self._seek_frame = target
+            self._seek_generation += 1
             self._last_prediction_second = -9999.0
-        if not self._running:
+        if not self._running or self.is_paused:
             self._emit_frame_at(target)
 
     def _run(self) -> None:
@@ -168,10 +199,14 @@ class VideoService:
             return
         cap = cv2.VideoCapture(self.video_path)
         if not cap.isOpened():
+            cap.release()
+            self._running = False
+            self._state = "stopped"
             self.error_callback(f"Could not open video: {self.video_path}")
+            self._emit_progress()
             return
 
-        self._running = True
+        stop_event = self._stop_event
         cap.set(cv2.CAP_PROP_POS_FRAMES, self.current_frame_index)
         try:
             while not self._stop_event.is_set():
@@ -187,6 +222,7 @@ class VideoService:
 
                 ok, frame = cap.read()
                 if not ok or frame is None:
+                    self._state = "finished"
                     break
 
                 frame_index = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1
@@ -200,25 +236,12 @@ class VideoService:
                 self.frame_callback(frame.copy(), metadata)
                 self._emit_progress()
 
-                if self._should_predict(self.current_frame_index):
-                    try:
-                        self._last_checked_frame = self.current_frame_index
-                        self._last_checked_time = format_video_timestamp(metadata.get("current_second", 0.0))
-                        prediction_started_at = time.perf_counter()
-                        prediction = self.prediction_service.predict_frame(frame.copy())
-                        prediction_finished_at = time.perf_counter()
-                        prediction_metadata = dict(metadata)
-                        prediction_metadata.update(
-                            {
-                                "processing_time_ms": round((prediction_finished_at - prediction_started_at) * 1000, 2),
-                                "detection_video_timestamp": format_video_timestamp(metadata.get("current_second", 0.0)),
-                                "detection_frame_number": self.current_frame_index,
-                                "playback_fps": round(self._playback_fps, 2),
-                            }
-                        )
-                        self.prediction_callback(prediction, frame.copy(), prediction_metadata)
-                    except Exception as exc:
-                        self.error_callback(f"Prediction failed: {exc}")
+                if not self._prediction_busy and self._should_predict(self.current_frame_index):
+                    self._prediction_busy = True
+                    self._prediction_thread = threading.Thread(
+                        target=self._predict_worker,
+                        args=(frame.copy(), dict(metadata), stop_event, self._seek_generation), daemon=True)
+                    self._prediction_thread.start()
 
                 with self._lock:
                     speed = self.speed
@@ -227,8 +250,29 @@ class VideoService:
         finally:
             cap.release()
             self._running = False
-            self._stop_event.clear()
             self._last_frame_at = None
+            self._emit_progress()
+
+    def _predict_worker(self, frame, metadata, stop_event, seek_generation):
+        try:
+            started = time.perf_counter()
+            prediction = self.prediction_service.predict_frame(frame.copy())
+            if stop_event.is_set() or seek_generation != self._seek_generation:
+                return
+            self._last_checked_frame = metadata["frame_index"]
+            self._last_checked_time = format_video_timestamp(metadata["current_second"])
+            metadata.update(processing_time_ms=round((time.perf_counter() - started) * 1000, 2),
+                            detection_video_timestamp=self._last_checked_time,
+                            detection_frame_number=metadata["frame_index"])
+            self.prediction_callback(prediction, frame, metadata)
+            self._emit_progress()
+        except Exception as exc:
+            if not stop_event.is_set():
+                self.error_callback(f"Prediction failed: {exc}")
+                self._stop_event.set()
+                self._state = "stopped"
+        finally:
+            self._prediction_busy = False
 
     def _should_predict(self, frame_index: int) -> bool:
         with self._lock:
@@ -246,6 +290,7 @@ class VideoService:
         current_second = self.current_frame_index / max(self.fps, 1.0)
         next_check = self._next_check_label(self.current_frame_index)
         return {
+            "session": self.session,
             "source_type": "video",
             "source_path": self.video_path or "",
             "frame_index": self.current_frame_index,
@@ -266,6 +311,8 @@ class VideoService:
         percent = (self.current_frame_index / max(1, self.frame_count - 1)) * 100 if self.frame_count else 0.0
         self.progress_callback(
             {
+                **self._metadata(),
+                "state": self._state,
                 "frame_index": self.current_frame_index,
                 "frame_count": self.frame_count,
                 "current_second": current_second,

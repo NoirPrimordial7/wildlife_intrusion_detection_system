@@ -45,9 +45,9 @@ class EvidencePanel(ctk.CTkFrame):
 
         self.danger_banner = ctk.CTkLabel(
             self,
-            text="Latest Confirmed Alert: --",
+            text="No confirmed alerts",
             text_color="#ffffff",
-            fg_color=COLORS["critical"],
+            fg_color=COLORS["surface_alt"],
             corner_radius=6,
             font=ctk.CTkFont(size=18, weight="bold"),
             height=42,
@@ -80,9 +80,9 @@ class EvidencePanel(ctk.CTkFrame):
         action_frame = ctk.CTkFrame(self, fg_color="transparent")
         action_frame.grid(row=5, column=0, sticky="ew", padx=16, pady=(0, 12))
         action_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        ctk.CTkButton(action_frame, text="Acknowledge Alert", height=28, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self._acknowledge).grid(row=0, column=0, sticky="ew", padx=(0, 4))
-        ctk.CTkButton(action_frame, text="Open Report", height=28, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self._open_report).grid(row=0, column=1, sticky="ew", padx=4)
-        ctk.CTkButton(action_frame, text="Enable SMS Settings", height=28, corner_radius=6, fg_color=COLORS["accent"], hover_color=COLORS["accent_hover"], command=self._enable_sms).grid(row=0, column=2, sticky="ew", padx=(4, 0))
+        ctk.CTkButton(action_frame, text="Acknowledge", width=85, height=30, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self._acknowledge).grid(row=0, column=0, sticky="ew", padx=(0, 4))
+        ctk.CTkButton(action_frame, text="Report", width=70, height=30, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self._open_report).grid(row=0, column=1, sticky="ew", padx=4)
+        ctk.CTkButton(action_frame, text="SMS / Calls", width=85, text_color=COLORS["accent_text"], height=30, corner_radius=6, fg_color=COLORS["accent"], hover_color=COLORS["accent_hover"], command=self._enable_sms).grid(row=0, column=2, sticky="ew", padx=(4, 0))
 
         timeline_title = ctk.CTkLabel(
             self,
@@ -108,13 +108,13 @@ class EvidencePanel(ctk.CTkFrame):
         status = str(event.get("notification_status", "--")).title()
         cooldown = event.get("cooldown_remaining", "--")
         text = str(event.get("animal", "Unknown"))
-        self.danger_banner.configure(text=f"Latest Confirmed Alert: {text}")
+        self.danger_banner.configure(text=f"DANGER / {text}", fg_color=COLORS["critical"])
         self.alert_detail_label.configure(
             text=(
                 f"Animal: {text}\n"
                 f"Confidence: {confidence:.1%}\n"
                 f"Video time: {event.get('detection_video_timestamp', '--')}\n"
-                f"Notification: {status}\n"
+                f"SMS: {status} / Calls: {event.get('call_status', '--')}\n"
                 f"Last SMS sent time: {event.get('last_sms_time', '--')}\n"
                 f"Next SMS allowed in: {cooldown} sec"
             )
@@ -132,10 +132,10 @@ class EvidencePanel(ctk.CTkFrame):
             image.thumbnail((310, 150))
             self._snapshot_image = ctk.CTkImage(light_image=image, dark_image=image, size=image.size)
             self.snapshot_label.configure(image=self._snapshot_image, text="")
-            self.open_snapshot_button.configure(state="normal", fg_color=COLORS["accent"])
+            self.open_snapshot_button.configure(state="normal", fg_color=COLORS["accent"], text_color=COLORS["accent_text"])
         except Exception:
             self.snapshot_label.configure(text=snapshot_path, image=None)
-            self.open_snapshot_button.configure(state="normal", fg_color=COLORS["accent"])
+            self.open_snapshot_button.configure(state="normal", fg_color=COLORS["accent"], text_color=COLORS["accent_text"])
 
     def _render_timeline(self, events: list[dict[str, Any]]) -> None:
         if self.timeline_frame is None:

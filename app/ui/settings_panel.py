@@ -110,7 +110,10 @@ class SettingsPanel(ctk.CTkFrame):
         save_button.grid(row=7, column=0, columnspan=2, sticky="ew", padx=16, pady=(10, 16))
 
         self._build_sms_settings(8)
-        self._build_registered_users(15)
+        self.voice_enabled_var = ctk.BooleanVar(value=bool(self.sms_config.get("voice_enabled", False)))
+        ctk.CTkCheckBox(self, text="Voice alerts (Twilio)", variable=self.voice_enabled_var,
+                        command=self._save_voice_config, fg_color=COLORS["accent"], text_color=COLORS["text"]).grid(row=15, column=0, columnspan=2, sticky="w", padx=16, pady=8)
+        self._build_registered_users(17)
 
     def _entry_row(self, row: int, label_text: str, value: str) -> ctk.CTkEntry:
         label = ctk.CTkLabel(self, text=label_text, text_color=COLORS["muted"], anchor="w")
@@ -131,14 +134,22 @@ class SettingsPanel(ctk.CTkFrame):
         self.threshold_value.configure(text=f"Threshold: {float(value):.0%}")
 
     def _save(self) -> None:
-        updates = {
-            "confidence_threshold": round(float(self.threshold_var.get()), 2),
-            "required_repeated_detections": max(1, int(self.repeat_entry.get())),
-            "alert_cooldown_seconds": max(0, int(self.cooldown_var.get())),
-            "camera_location": self.location_entry.get().strip() or "Village Border Camera",
-            "siren_enabled": bool(self.siren_enabled_var.get()),
-        }
-        self.on_save(updates)
+        try:
+            repeats = int(self.repeat_entry.get())
+            cooldown = int(self.cooldown_var.get())
+            location = self.location_entry.get().strip()
+            if not 1 <= repeats <= 100:
+                raise ValueError("Repeated detections must be between 1 and 100.")
+            if cooldown < 0:
+                raise ValueError("Cooldown cannot be negative.")
+            if not location:
+                raise ValueError("Enter a camera location.")
+        except ValueError as exc:
+            messagebox.showerror("Check your settings", str(exc))
+            return
+        self.on_save({"confidence_threshold": round(float(self.threshold_var.get()), 2),
+                      "required_repeated_detections": repeats, "alert_cooldown_seconds": cooldown,
+                      "camera_location": location, "siren_enabled": bool(self.siren_enabled_var.get())})
 
     def _build_sms_settings(self, start_row: int) -> None:
         divider = ctk.CTkFrame(self, fg_color=COLORS["border"], height=1)
@@ -175,14 +186,73 @@ class SettingsPanel(ctk.CTkFrame):
         self.sms_ready_label.grid(row=start_row + 4, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 8))
         refresh_button = ctk.CTkButton(self, text="Refresh Status", height=30, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self._refresh_status)
         refresh_button.grid(row=start_row + 5, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 10))
+        ctk.CTkButton(self, text="Configure provider credentials", height=32, fg_color=COLORS["surface_alt"],
+                      command=self._edit_credentials).grid(row=start_row + 6, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 12))
+
+    def _save_voice_config(self):
+        self._sync_user_enabled_state()
+        if self.voice_enabled_var.get() and not messagebox.askyesno("Enable voice alerts?", "Twilio voice calls use your provider balance. Enable calls to your registered recipients?"):
+            self.voice_enabled_var.set(False)
+        if self.on_save_sms_config:
+            self.on_save_sms_config({"voice_enabled": bool(self.voice_enabled_var.get())})
+        self._render_user_rows()
+
+    def _voice_test_ready(self):
+        credentials = self.sms_config.get("twilio", {})
+        return bool(self.voice_enabled_var.get()) and all(str(credentials.get(key, "")).strip() for key in ("account_sid", "auth_token", "from_number"))
+
+    def _test_user_call(self, index):
+        self._sync_user_enabled_state()
+        if 0 <= index < len(self.registered_users) and getattr(self, "on_test_call", None):
+            self.on_test_call(self.registered_users[index])
+
+    def _edit_credentials(self):
+        provider = self.sms_provider_var.get().strip().casefold().replace(" ", "_")
+        fields = {"twilio": [("account_sid", "Account SID"), ("auth_token", "Auth token"), ("from_number", "Sender phone (+country code)")],
+                  "fast2sms": [("api_url", "API URL"), ("api_key", "API key"), ("sender_id", "Sender ID"), ("route", "Route")],
+                  "generic_http": [("api_url", "API URL"), ("api_key", "API key")]}
+        popup = ctk.CTkToplevel(self)
+        popup.title("SMS provider credentials")
+        popup.geometry("440x440")
+        popup.transient(self.winfo_toplevel())
+        popup.grab_set()
+        popup.configure(fg_color=COLORS["surface"])
+        popup.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(popup, text=self.sms_provider_var.get(), font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, sticky="w", padx=24, pady=(20, 8))
+        entries = {}
+        for index, (key, label) in enumerate(fields[provider]):
+            ctk.CTkLabel(popup, text=label, anchor="w").grid(row=index * 2 + 1, column=0, sticky="ew", padx=24)
+            entry = ctk.CTkEntry(popup, show="*" if key in {"auth_token", "api_key"} else "")
+            entry.insert(0, str(self.sms_config.get(provider, {}).get(key, "")))
+            entry.grid(row=index * 2 + 2, column=0, sticky="ew", padx=24, pady=(0, 5))
+            entries[key] = entry
+        def save():
+            updates = {"provider": provider, provider: {key: entry.get().strip() for key, entry in entries.items()}}
+            # Preserve fields that this editor does not expose (e.g. HTTP method).
+            updates[provider] = {**self.sms_config.get(provider, {}), **updates[provider]}
+            if self.on_save_sms_config:
+                self.on_save_sms_config(updates)
+            self.reload_sms_config({**self.sms_config, **updates})
+            popup.destroy()
+        ctk.CTkButton(popup, text="Save credentials", command=save, fg_color=COLORS["accent"], text_color=COLORS["accent_text"]).grid(row=10, column=0, sticky="ew", padx=24, pady=12)
+
+    def reload_sms_config(self, config):
+        self._sync_user_enabled_state()
+        self.sms_config = dict(config)
+        if hasattr(self, "voice_enabled_var"):
+            self.voice_enabled_var.set(bool(config.get("voice_enabled", False)))
+        self.sms_enabled_var.set(bool(config.get("enabled", False)))
+        self.sms_provider_var.set(self._provider_display(str(config.get("provider", "twilio"))))
+        self.sms_secret_label.configure(text=self._masked_sms_summary())
+        self.sms_ready_label.configure(text=self._sms_ready_text(), text_color=COLORS["safe"] if self._sms_provider_ready() else COLORS["critical"])
+        self._render_user_rows()
 
     def _masked_sms_summary(self) -> str:
-        twilio = self.sms_config.get("twilio", {}) if isinstance(self.sms_config.get("twilio"), dict) else {}
-        return (
-            f"Account SID: {mask_phone(twilio.get('account_sid', ''))}\n"
-            "Auth token: hidden\n"
-            f"From number: {mask_phone(twilio.get('from_number', ''))}"
-        )
+        provider = self.sms_provider_var.get().strip().casefold().replace(" ", "_")
+        config = self.sms_config.get(provider, {})
+        if provider == "twilio":
+            return f"Account SID: {mask_phone(config.get('account_sid', ''))}\nAuth token: hidden\nFrom number: {mask_phone(config.get('from_number', ''))}"
+        return f"Provider: {self.sms_provider_var.get()}\nAPI key: hidden\nCredentials stay in your local configuration."
 
     def _sms_provider_ready(self) -> bool:
         provider = self.sms_provider_var.get().strip().casefold().replace(" ", "_")
@@ -215,6 +285,7 @@ class SettingsPanel(ctk.CTkFrame):
                 self.sms_enabled_var.set(False)
         provider = self.sms_provider_var.get().strip().casefold().replace(" ", "_")
         updates = {"enabled": bool(self.sms_enabled_var.get()), "provider": provider}
+        self._sync_user_enabled_state()
         if self.on_save_sms_config:
             self.on_save_sms_config(updates)
         if hasattr(self, "sms_ready_label"):
@@ -288,9 +359,13 @@ class SettingsPanel(ctk.CTkFrame):
         name = self.new_name_entry.get().strip()
         phone = self.new_phone_entry.get().strip()
         if not name or not phone:
+            self._set_user_message("Enter both a name and an international phone number.")
             return
         if not is_valid_phone(phone):
             self._set_user_message(f"Invalid phone number: {phone}")
+            return
+        if any(str(user.get("phone", "")) == phone for user in self.registered_users):
+            self._set_user_message("This phone number is already registered.")
             return
         self.registered_users.append(
             {
@@ -353,10 +428,12 @@ class SettingsPanel(ctk.CTkFrame):
             checkbox.grid(row=0, column=1, sticky="e", padx=10, pady=8)
             actions = ctk.CTkFrame(row, fg_color="transparent")
             actions.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=(0, 8))
-            actions.grid_columnconfigure((0, 1), weight=1)
+            actions.grid_columnconfigure((0, 1, 2), weight=1)
             test_button = ctk.CTkButton(
                 actions,
                 text="Test SMS",
+                width=70,
+                text_color=COLORS["accent_text"] if self._sms_test_ready() else COLORS["text"],
                 height=28,
                 corner_radius=6,
                 fg_color=COLORS["accent"] if self._sms_test_ready() else COLORS["border"],
@@ -364,11 +441,12 @@ class SettingsPanel(ctk.CTkFrame):
                 command=lambda idx=index: self._test_user_sms(idx),
                 state="normal" if self._sms_test_ready() else "disabled",
             )
-            self._attach_tooltip(test_button, "Requires Twilio configuration")
+            self._attach_tooltip(test_button, "Requires enabled SMS and provider credentials")
             test_button.grid(row=0, column=0, sticky="ew", padx=(0, 4))
             delete_button = ctk.CTkButton(
                 actions,
                 text="Delete",
+                width=70,
                 height=28,
                 corner_radius=6,
                 fg_color=COLORS["danger"],
@@ -376,11 +454,14 @@ class SettingsPanel(ctk.CTkFrame):
                 command=lambda idx=index: self._delete_user(idx),
             )
             delete_button.grid(row=0, column=1, sticky="ew", padx=(4, 0))
+            ctk.CTkButton(actions, text="Test Call", width=70, height=28, fg_color=COLORS["surface_alt"],
+                          state="normal" if self._voice_test_ready() else "disabled",
+                          command=lambda idx=index: self._test_user_call(idx)).grid(row=0, column=2, sticky="ew", padx=(4, 0))
             self.user_rows.append({"user": user, "enabled_var": enabled_var})
 
         self.user_message = ctk.CTkLabel(
             self.users_frame,
-            text="" if self._sms_test_ready() else "Test SMS requires Twilio configuration.",
+            text="" if self._sms_test_ready() else "Test SMS requires enabled SMS and provider credentials.",
             text_color=COLORS["muted"],
             anchor="w",
             wraplength=310,

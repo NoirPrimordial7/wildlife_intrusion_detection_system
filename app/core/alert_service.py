@@ -288,10 +288,13 @@ class AlertService:
             }
 
             notification_results = self.notification_service.send_alert_to_registered_users(event)
+            call_results = self.notification_service.send_alert_calls(event)
+            event["call_results"] = call_results
+            event["call_status"] = "queued" if any(row.get("status") == "queued" for row in call_results) else "failed" if call_results else "disabled"
             event["notification_results"] = notification_results
             event["notification_status"] = self._notification_summary(notification_results)
             event["notification_summary"] = self._notification_message(notification_results)
-            event["notification_sent"] = bool(notification_results)
+            event["notification_sent"] = any(row.get("status") == "sent" for row in notification_results)
             event["last_sms_time"] = self._last_sms_time(notification_results)
             event["cooldown_remaining"] = int(self.config.get("alert_cooldown_seconds", 120))
 

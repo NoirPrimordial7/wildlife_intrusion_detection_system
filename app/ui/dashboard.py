@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import queue
 import subprocess
 import sys
 import threading
@@ -11,6 +12,7 @@ from typing import Any
 
 import customtkinter as ctk
 
+from app.core.demo_service import DemoService
 from app.core.alert_service import AlertService
 from app.core.camera_service import CameraService
 from app.core.clip_service import ClipService
@@ -40,8 +42,8 @@ class Dashboard(ctk.CTk):
         ensure_project_dirs()
 
         self.title("VanRakshak AI Wildlife Monitoring System")
-        self.geometry("1480x860")
-        self.minsize(1160, 720)
+        self.geometry("1360x840")
+        self.minsize(1120, 700)
         self.configure(fg_color=COLORS["app_bg"])
 
         self.prediction_service = PredictionService()
@@ -79,15 +81,32 @@ class Dashboard(ctk.CTk):
         self._last_decision: dict[str, Any] | None = None
         self._timeline_markers: list[dict[str, Any]] = []
         self._danger_flash: ctk.CTkFrame | None = None
+        self._closing = False
+        self._ui_queue = queue.SimpleQueue()
+        self._pending_frame = None
+        self._frame_lock = threading.Lock()
+        self._session = 0
+        self.demo_service = DemoService(self._on_frame_from_worker, self._on_prediction_from_worker, self._on_video_progress_from_worker)
         self._build_layout()
+        self.after(30, self._drain_ui_queue)
         self._refresh_static_state()
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _build_layout(self) -> None:
-        self.grid_columnconfigure(0, minsize=240, weight=0)
+        self.grid_columnconfigure(0, minsize=208, weight=0)
         self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure(2, minsize=410, weight=0)
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(2, minsize=360, weight=0)
+        self.grid_rowconfigure(1, weight=1)
+        header = ctk.CTkFrame(self, fg_color="transparent")
+        header.grid(row=0, column=1, columnspan=2, sticky="ew", padx=20, pady=(18, 0))
+        header.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(header, text="The field, in focus.", text_color=COLORS["text"],
+                     font=ctk.CTkFont(size=27, weight="bold"), anchor="w").grid(row=0, column=0, sticky="w")
+        ctk.CTkLabel(header, text="Observe wildlife. Confirm the risk. Keep the evidence.",
+                     text_color=COLORS["muted"], font=ctk.CTkFont(size=12), anchor="w").grid(row=1, column=0, sticky="w", pady=(2, 8))
+        self.session_badge = ctk.CTkLabel(header, text="READY / LOCAL AI", corner_radius=8, fg_color=COLORS["surface_alt"],
+                                         text_color=COLORS["accent"], width=150, height=32, font=ctk.CTkFont(size=11, weight="bold"))
+        self.session_badge.grid(row=0, column=1, rowspan=2, padx=(12, 0))
 
         self.sidebar = Sidebar(
             self,
@@ -100,9 +119,12 @@ class Dashboard(ctk.CTk):
                 "open_alerts": self.open_alerts_folder,
                 "settings": self.focus_settings,
                 "quick_demo": self.quick_demo,
+                "overview": lambda: self.inspector.set("Overview"),
+                "evidence": lambda: self.inspector.set("Evidence"),
+                "notifications": lambda: self.inspector.set("Messages"),
             },
         )
-        self.sidebar.grid(row=0, column=0, sticky="nsw")
+        self.sidebar.grid(row=0, rowspan=2, column=0, sticky="nsw")
 
         self.camera_panel = CameraPanel(
             self,
@@ -112,36 +134,50 @@ class Dashboard(ctk.CTk):
                 "resume": self.video_resume,
                 "stop": self.video_stop,
                 "restart": self.video_restart,
-                "backward": lambda: self.video_service.seek_seconds(-5),
-                "forward": lambda: self.video_service.seek_seconds(5),
-                "speed": self.video_service.set_speed,
-                "interval": self.video_service.set_detection_interval,
-                "seek_percent": self.video_service.seek_percent,
+                "backward": lambda: self._playback.seek_seconds(-5),
+                "forward": lambda: self._playback.seek_seconds(5),
+                "speed": lambda value: self._playback.set_speed(value),
+                "interval": lambda value: self._playback.set_detection_interval(value),
+                "seek_percent": lambda value: self._playback.seek_percent(value),
             },
         )
-        self.camera_panel.grid(row=0, column=1, sticky="nsew")
+        self.camera_panel.grid(row=1, column=1, sticky="nsew")
 
-        self.right_panel = ctk.CTkScrollableFrame(self, width=410, fg_color=COLORS["app_bg"], corner_radius=0)
-        self.right_panel.grid(row=0, column=2, sticky="nsew", padx=(0, 14), pady=14)
-        self.right_panel.grid_columnconfigure(0, weight=1)
+        self.inspector = ctk.CTkTabview(self, width=360, fg_color=COLORS["app_bg"],
+                                       segmented_button_fg_color=COLORS["surface"],
+                                       segmented_button_selected_color=COLORS["surface_alt"],
+                                       segmented_button_selected_hover_color=COLORS["border"],
+                                       segmented_button_unselected_color=COLORS["surface"],
+                                       segmented_button_unselected_hover_color=COLORS["border"])
+        self.inspector.grid(row=1, column=2, sticky="nsew", padx=(0, 14), pady=(0, 14))
+        self.tab_panels = {}
+        for name in ("Overview", "Evidence", "Messages", "Settings"):
+            tab = self.inspector.add(name)
+            tab.grid_columnconfigure(0, weight=1)
+            tab.grid_rowconfigure(0, weight=1)
+            panel = ctk.CTkScrollableFrame(tab, width=330, fg_color=COLORS["app_bg"], corner_radius=0)
+            panel.grid(row=0, column=0, sticky="nsew")
+            panel.grid_columnconfigure(0, weight=1)
+            self.tab_panels[name] = panel
+        self.right_panel = self.tab_panels["Overview"]
 
         self.threat_panel = ThreatPanel(self.right_panel)
         self.threat_panel.grid(row=0, column=0, sticky="ew")
 
         self.evidence_panel = EvidencePanel(
-            self.right_panel,
+            self.tab_panels["Evidence"],
             self.open_project_file,
             self.export_report,
             self.focus_settings,
             self.acknowledge_alert,
         )
-        self.evidence_panel.grid(row=1, column=0, sticky="ew", pady=(0, 12))
+        self.evidence_panel.grid(row=0, column=0, sticky="ew", pady=(0, 12))
 
-        self.alert_history_panel = AlertHistoryPanel(self.right_panel, self.open_project_file)
-        self.alert_history_panel.grid(row=2, column=0, sticky="ew", pady=(0, 12))
+        self.alert_history_panel = AlertHistoryPanel(self.tab_panels["Evidence"], self.open_project_file)
+        self.alert_history_panel.grid(row=1, column=0, sticky="ew", pady=(0, 12))
 
         self.settings_panel = SettingsPanel(
-            self.right_panel,
+            self.tab_panels["Settings"],
             self.alert_service.config,
             self.save_settings,
             self.stop_alarm,
@@ -152,16 +188,54 @@ class Dashboard(ctk.CTk):
             self.save_sms_config,
             self.refresh_notification_views,
         )
-        self.settings_panel.grid(row=3, column=0, sticky="ew")
+        self.settings_panel.on_test_call = self.test_call_user
+        self.settings_panel.grid(row=0, column=0, sticky="ew")
 
         self.notification_log_panel = NotificationLogPanel(
-            self.right_panel,
+            self.tab_panels["Messages"],
             self.clear_notification_log,
             self.export_notification_log,
         )
-        self.notification_log_panel.grid(row=4, column=0, sticky="ew", pady=(0, 12))
+        self.notification_log_panel.grid(row=0, column=0, sticky="ew", pady=(0, 12))
+
+    @property
+    def _playback(self):
+        return self.demo_service if self._source_type == "demo" else self.video_service
+
+    def _post_ui(self, callback):
+        if not self._closing:
+            self._ui_queue.put(callback)
+
+    def _drain_ui_queue(self):
+        if self._closing:
+            return
+        for _ in range(40):
+            try:
+                callback = self._ui_queue.get_nowait()
+            except queue.Empty:
+                break
+            callback()
+        with self._frame_lock:
+            pending, self._pending_frame = self._pending_frame, None
+        if pending is not None:
+            frame, metadata = pending
+            if self._metadata_is_current(metadata):
+                self._apply_frame(frame, metadata)
+        self.after(30, self._drain_ui_queue)
+
+    def _metadata_is_current(self, metadata):
+        return (not self._closing and metadata.get("session", self._session) == self._session
+                and metadata.get("source_type") == self._source_type
+                and os.path.normcase(os.path.normpath(str(metadata.get("source_path", "")))) == os.path.normcase(os.path.normpath(self._source_path)))
+
+    def _style_actions(self, parent):
+        for child in parent.winfo_children():
+            if isinstance(child, ctk.CTkButton) and child.cget("fg_color") == COLORS["accent"]:
+                child.configure(text_color=COLORS["accent_text"])
+            self._style_actions(child)
 
     def _refresh_static_state(self) -> None:
+        self._style_actions(self)
         config = self.alert_service.config
         self.threat_panel.update_camera_info(config, self._source_type, self._source_path)
         self.threat_panel.update_sms_status(self.notification_service.sms_status())
@@ -171,8 +245,8 @@ class Dashboard(ctk.CTk):
             confidence=0.0,
             threat_level="LOW",
             ai_interval=self.video_service.interval_label,
-            source_type="video",
-            stream_state="Upload a video, then click Start Detection",
+            source_type="idle",
+            stream_state="Ready / select a source",
         )
 
     def upload_video(self) -> None:
@@ -197,60 +271,61 @@ class Dashboard(ctk.CTk):
         self.camera_panel.set_metrics(0.0, 0.0, "--", 0.0)
         self.threat_panel.update_threat("LOW", "Video loaded. Waiting for Start Detection.")
         self.threat_panel.update_camera_info(self.alert_service.config, self._source_type, path)
-        self.video_service.open_video(path)
+        self._timeline_markers = []
+        self.camera_panel.set_timeline_markers([], self.video_service.seek_frame)
+        self.video_service.session = self._session
+        self.session_badge.configure(text="VIDEO / READY")
+        self.inspector.set("Overview")
+        self.camera_panel.interval_menu.set(self.video_service.interval_label)
+        self.camera_panel.speed_menu.set(f"{self.video_service.speed:g}x")
+        if not self.video_service.open_video(path):
+            self.stop_monitoring()
 
     def quick_demo(self) -> None:
-        best_video = TEST_VIDEOS_DIR / "Screen_Recording_20260424_194258_YouTube.mp4"
-        if not best_video.exists():
-            self._show_error(f"Best demo video not found:\n{best_video}")
-            return
         self.stop_monitoring(reset_status=False)
-        self.notification_service.clear_notification_log()
+        self._source_type = "demo"
+        self._source_path = "built-in simulation"
         self._timeline_markers = []
-        self.video_service.set_detection_interval("Every 16 frames")
-        self._source_type = "video"
-        self._source_path = str(best_video)
         self.camera_panel.show_video_controls(True)
-        self.camera_panel.set_timeline_markers([], self.video_service.seek_frame)
-        self.camera_panel.set_status(
-            animal="--",
-            confidence=0.0,
-            threat_level="LOW",
-            ai_interval=self.video_service.interval_label,
-            source_type="video",
-            stream_state="Loading best demo video...",
-        )
-        self.video_service.open_video(str(best_video))
-        self.after(450, self.video_start)
+        self.camera_panel.interval_menu.set(self.demo_service.interval_label)
+        self.camera_panel.speed_menu.set("1x")
+        self.camera_panel.set_timeline_markers([], self.demo_service.seek_frame)
+        self.session_badge.configure(text="DEMO / SIMULATION")
+        self.inspector.set("Overview")
+        self.threat_panel.update_camera_info(self.alert_service.config, "demo", self._source_path)
+        self.camera_panel.set_status(animal="--", confidence=0, threat_level="LOW", source_type="demo", stream_state="Guided simulation / no SMS sent")
+        self.demo_service.speed = 1.0
+        self.demo_service.session = self._session
+        self.demo_service.restart()
 
     def video_start(self) -> None:
         self.camera_service.stop(wait=False)
         self.camera_panel.set_status(stream_state="Monitoring video for dangerous wildlife intrusion...")
         self.threat_panel.update_threat("LOW", "Monitoring video for dangerous wildlife intrusion...")
-        self.video_service.start()
+        self._playback.start()
 
     def video_pause(self) -> None:
-        self.video_service.pause()
+        self._playback.pause()
         self.camera_panel.set_status(stream_state="Detection paused")
 
     def video_resume(self) -> None:
         self.camera_panel.set_status(stream_state="Monitoring video for dangerous wildlife intrusion...")
-        self.video_service.resume()
+        self._playback.resume()
 
     def video_stop(self) -> None:
-        self.video_service.stop(wait=False, reset=True)
+        self._playback.stop(wait=True, reset=True)
         self.clip_service.finalize_camera(self.alert_service.config.get("camera_id", "CAM_01"))
         self._last_stable_prediction = None
         self._last_decision = None
-        self.camera_panel.set_status(threat_level="LOW", source_type="video", stream_state="Detection stopped")
+        self.camera_panel.set_status(animal="--", confidence=0, threat_level="LOW", source_type=self._source_type, stream_state="Detection stopped")
         self.threat_panel.update_threat("LOW", "Detection stopped")
 
     def video_restart(self) -> None:
         self.camera_panel.set_status(stream_state="Monitoring video for dangerous wildlife intrusion...")
-        self.video_service.restart()
+        self._playback.restart()
 
     def start_webcam_monitoring(self) -> None:
-        self.video_service.stop(wait=False, reset=False)
+        self.stop_monitoring(reset_status=False)
         self._source_type = "webcam"
         self._source_path = "camera:0"
         self.camera_panel.show_video_controls(False)
@@ -262,7 +337,9 @@ class Dashboard(ctk.CTk):
             source_type="webcam",
             stream_state="Starting webcam monitoring...",
         )
-        self.camera_service.start(camera_index=0, prediction_interval_seconds=1.0)
+        self.session_badge.configure(text="WEBCAM / MONITORING")
+        self.threat_panel.update_camera_info(self.alert_service.config, "webcam", "camera:0")
+        self.camera_service.start_camera_stream("webcam", 0, 1.0, {"session": self._session})
 
     def upload_image(self) -> None:
         path = filedialog.askopenfilename(
@@ -290,9 +367,13 @@ class Dashboard(ctk.CTk):
             stream_state="Analyzing image",
         )
         self.threat_panel.update_camera_info(self.alert_service.config, self._source_type, path)
-        threading.Thread(target=self._predict_image_worker, args=(frame, path), daemon=True).start()
+        self.session_badge.configure(text="IMAGE / ANALYZING")
+        self.inspector.set("Overview")
+        threading.Thread(target=self._predict_image_worker, args=(frame, path, self._session), daemon=True).start()
 
     def stop_monitoring(self, reset_status: bool = True) -> None:
+        self._session += 1
+        self.demo_service.stop(wait=True, reset=False)
         self.camera_service.stop(wait=False)
         self.video_service.stop(wait=False, reset=False)
         self.clip_service.finalize_all()
@@ -301,7 +382,10 @@ class Dashboard(ctk.CTk):
         if reset_status:
             self._source_type = "idle"
             self._source_path = ""
-            self.camera_panel.set_status(threat_level="LOW", ai_interval=self.video_service.interval_label, source_type="idle", stream_state="Stopped")
+            self.session_badge.configure(text="READY / LOCAL AI")
+            self.camera_panel.show_video_controls(False)
+            self.camera_panel.clear_frame()
+            self.camera_panel.set_status(animal="--", confidence=0, threat_level="LOW", ai_interval=self.video_service.interval_label, source_type="idle", stream_state="Stopped")
             self.threat_panel.update_threat("LOW", "Monitoring stopped")
             self.threat_panel.update_camera_info(self.alert_service.config, "idle", "")
 
@@ -317,9 +401,15 @@ class Dashboard(ctk.CTk):
         self.open_project_file(ALERTS_DIR)
 
     def open_project_file(self, path: str | Path) -> None:
+        if not str(path):
+            self._show_error("No evidence file is available yet.")
+            return
         target = Path(path)
         if not target.is_absolute():
             target = PROJECT_ROOT / target
+        if not target.exists():
+            self._show_error(f"File is no longer available: {target}")
+            return
         try:
             if os.name == "nt":
                 os.startfile(str(target))
@@ -331,6 +421,8 @@ class Dashboard(ctk.CTk):
             self._show_error(f"Could not open file: {exc}")
 
     def focus_settings(self) -> None:
+        self.inspector.set("Settings")
+        self.tab_panels["Settings"]._parent_canvas.yview_moveto(0)
         self.settings_panel.configure(border_width=2, border_color=COLORS["accent"])
         self.after(1200, lambda: self.settings_panel.configure(border_width=0))
 
@@ -364,27 +456,44 @@ class Dashboard(ctk.CTk):
             messagebox.showinfo("SMS not active", "SMS is disabled for demo. Enable it in Settings after adding credentials.")
             self.refresh_notification_views()
             return
-        result = self.notification_service.send_test_sms(user)
-        self.threat_panel.update_sms_status(self.notification_service.sms_status())
+        def worker():
+            try:
+                result = self.notification_service.send_test_sms(user)
+            except Exception as exc:
+                result = {"status": "failed", "error": str(exc)}
+            self._post_ui(lambda: self._show_sms_result(result))
+        threading.Thread(target=worker, daemon=True).start()
+
+    def test_call_user(self, user):
+        def worker():
+            try:
+                result = self.notification_service.send_test_call(user)
+            except Exception as exc:
+                result = {"status": "failed", "error": str(exc), "channel": "voice"}
+            self._post_ui(lambda: self._show_sms_result(result))
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _show_sms_result(self, result):
+        self.refresh_notification_views()
         status = result.get("status", "unknown")
-        error = result.get("error")
-        if status == "sent":
-            messagebox.showinfo("Test SMS sent", f"SMS sent to {result.get('phone', '')}.")
-        elif status == "disabled":
-            messagebox.showinfo("SMS not active", "SMS is disabled for demo. Enable it in Settings after adding credentials.")
+        if status == "queued":
+            messagebox.showinfo("Test call queued", "Twilio accepted the call request. Check the recipient phone. Queued does not mean answered.")
+        elif status == "sent":
+            messagebox.showinfo("Test SMS sent", "Provider accepted the test SMS. Check the recipient phone.")
         else:
-            self.alert_service.logger.warning("SMS test failed: provider=%s error=%s", sms_config.get("provider", "twilio"), error)
-            messagebox.showinfo("SMS not configured", "SMS is not configured yet. Please add Twilio credentials in Settings.")
+            messagebox.showinfo("Test SMS result", f"Status: {status}\n{result.get('error', '')}")
 
     def stop_alarm(self) -> None:
         self.siren_service.stop()
 
     def acknowledge_alert(self) -> None:
-        self.threat_panel.update_threat("LOW", "Alert acknowledged")
+        self.threat_panel.update_threat("WARNING", "Alert acknowledged. Continue watching the current detection.")
         self.siren_service.stop()
 
     def refresh_notification_views(self) -> None:
         self.threat_panel.update_sms_status(self.notification_service.sms_status())
+        if hasattr(self, "settings_panel"):
+            self.settings_panel.reload_sms_config(self.notification_service.load_sms_config())
         if hasattr(self, "notification_log_panel"):
             self.notification_log_panel.update_logs(self.notification_service.load_notification_log())
 
@@ -396,12 +505,13 @@ class Dashboard(ctk.CTk):
         path = self.notification_service.export_notification_log()
         messagebox.showinfo("Notification log exported", f"Notification log saved to:\n{path}")
 
-    def _predict_image_worker(self, frame: Any, path: str) -> None:
+    def _predict_image_worker(self, frame: Any, path: str, session: int) -> None:
         try:
             started_at = time.perf_counter()
             prediction = self.detector_service.predict_frame(frame.copy())
             processing_time_ms = round((time.perf_counter() - started_at) * 1000, 2)
             metadata = {
+                "session": session,
                 "source_type": "image",
                 "source_path": path,
                 "ai_interval": "Single image",
@@ -415,9 +525,13 @@ class Dashboard(ctk.CTk):
             self._on_error_from_worker(f"Image prediction failed: {exc}")
 
     def _on_frame_from_worker(self, frame: Any, metadata: dict[str, Any]) -> None:
+        if not self._metadata_is_current(metadata):
+            return
         camera_id = str(metadata.get("camera_id") or self.alert_service.config.get("camera_id", "CAM_01"))
-        self.clip_service.add_frame(camera_id, frame, metadata)
-        self.after(0, lambda: self._apply_frame(frame, metadata))
+        if metadata.get("source_type") != "demo":
+            self.clip_service.add_frame(camera_id, frame, metadata)
+        with self._frame_lock:
+            self._pending_frame = (frame, metadata)
 
     def _apply_frame(self, frame: Any, metadata: dict[str, Any]) -> None:
         if self._last_stable_prediction and self._last_stable_prediction.get("detections"):
@@ -431,6 +545,16 @@ class Dashboard(ctk.CTk):
         self._handle_prediction_background(prediction, frame, metadata)
 
     def _handle_prediction_background(self, prediction: dict[str, Any], frame: Any, metadata: dict[str, Any]) -> None:
+        if not self._metadata_is_current(metadata):
+            return
+        if metadata.get("source_type") == "demo":
+            second = float(metadata.get("current_second", 0))
+            level = "DANGER" if 5 <= second < 10 else "WARNING" if 3 <= second < 5 else "LOW"
+            decision = {"threat_level": level, "severity": level, "alert_triggered": False,
+                        "repeat_count": 3 if level == "DANGER" else 1 if level == "WARNING" else 0,
+                        "reason": "SIMULATION / confirmed intrusion. Real monitoring saves evidence and can send SMS." if level == "DANGER" else "SIMULATION / wildlife approaching the village boundary." if level == "WARNING" else "SIMULATION / perimeter clear. No real alerts or SMS are created."}
+            self._post_ui(lambda: self._apply_prediction(prediction, frame, decision, metadata) if self._metadata_is_current(metadata) else None)
+            return
         decision = self.alert_service.evaluate_detection(
             prediction,
             frame,
@@ -440,7 +564,7 @@ class Dashboard(ctk.CTk):
             metadata.get("camera_location"),
             metadata,
         )
-        self.after(0, lambda: self._apply_prediction(prediction, frame, decision, metadata))
+        self._post_ui(lambda: self._apply_prediction(prediction, frame, decision, metadata) if self._metadata_is_current(metadata) else None)
 
     def _apply_prediction(self, prediction: dict[str, Any], frame: Any, decision: dict[str, Any], metadata: dict[str, Any]) -> None:
         source_type = metadata.get("source_type", self._source_type)
@@ -450,7 +574,8 @@ class Dashboard(ctk.CTk):
 
         if prediction.get("detections") or (threat_level in {"DANGER", "HIGH", "CRITICAL", "WARNING"} and decision.get("severity") != "LOW"):
             self.camera_panel.set_frame(draw_detection_overlay(frame, prediction, str(threat_level)))
-            self._add_timeline_marker(metadata, str(threat_level), prediction)
+            if source_type in {"video", "demo"}:
+                self._add_timeline_marker(metadata, str(threat_level), prediction)
 
         self.camera_panel.set_status(
             animal=prediction.get("display_label", prediction.get("label", "--")),
@@ -458,7 +583,7 @@ class Dashboard(ctk.CTk):
             threat_level=str(threat_level),
             ai_interval=ai_interval,
             source_type=source_type,
-            stream_state="Monitoring video for dangerous wildlife intrusion..." if source_type == "video" else "active",
+            stream_state="Guided simulation / no SMS" if source_type == "demo" else "Image analyzed" if source_type == "image" else "Monitoring active",
         )
         self.camera_panel.set_metrics(
             processing_time_ms=float(metadata.get("processing_time_ms", 0.0) or 0.0),
@@ -467,6 +592,7 @@ class Dashboard(ctk.CTk):
             playback_fps=float(metadata.get("playback_fps", 0.0) or 0.0),
         )
 
+        self.session_badge.configure(text="DEMO / SIMULATION" if source_type == "demo" else "IMAGE / COMPLETE" if source_type == "image" else "MONITORING / LOCAL AI")
         reason = str(decision.get("reason", ""))
         if threat_level in {"DANGER", "HIGH", "CRITICAL", "WARNING"} and decision.get("severity") != "LOW":
             event = decision.get("event") or {}
@@ -479,14 +605,17 @@ class Dashboard(ctk.CTk):
             int(self.alert_service.config.get("required_repeated_detections", 3)),
         )
         self.threat_panel.update_detection(prediction)
+        if prediction.get("yolo_error"):
+            self.threat_panel.mode_label.configure(text="Detection mode: classifier fallback / YOLO unavailable")
+        else:
+            self.threat_panel.mode_label.configure(text="Detection mode: scripted simulation" if source_type == "demo" else "Detection mode: Hybrid YOLO + Classifier")
         self.threat_panel.update_camera_info(self.alert_service.config, source_type, source_path)
         self._refresh_alert_views()
         self.threat_panel.update_sms_status(self.notification_service.sms_status())
-        self.refresh_notification_views()
         self._last_stable_prediction = prediction
         self._last_decision = decision
         self.camera_panel.set_monitoring_status(
-            sms_status="Enabled" if self.notification_service.sms_status().get("enabled") else "Disabled",
+            sms_status="Demo / blocked" if source_type == "demo" else "Enabled" if self.notification_service.sms_status().get("enabled") else "Disabled",
             cooldown_remaining=f"{self.alert_service.cooldown_remaining()} sec",
         )
 
@@ -495,7 +624,7 @@ class Dashboard(ctk.CTk):
             self._show_alert_popup(decision["event"])
 
     def _on_video_progress_from_worker(self, progress: dict[str, Any]) -> None:
-        self.after(0, lambda: self.camera_panel.set_progress(progress))
+        self._post_ui(lambda: self.camera_panel.set_progress(progress) if self._metadata_is_current(progress) else None)
 
     def _add_timeline_marker(self, metadata: dict[str, Any], level: str, prediction: dict[str, Any] | None = None) -> None:
         prediction = prediction or self._last_stable_prediction or {}
@@ -509,26 +638,20 @@ class Dashboard(ctk.CTk):
             }
         )
         self._timeline_markers = self._timeline_markers[-80:]
-        self.camera_panel.set_timeline_markers(self._timeline_markers, self.video_service.seek_frame)
+        self.camera_panel.set_timeline_markers(self._timeline_markers, self._playback.seek_frame)
 
     def _flash_danger(self, step: int = 0) -> None:
-        if self._danger_flash is None:
-            self._danger_flash = ctk.CTkFrame(self, fg_color="#9d1020", corner_radius=0)
-        if step >= 6:
-            self._danger_flash.place_forget()
+        if self._closing:
             return
-        if step % 2 == 0:
-            self._danger_flash.place(relx=0, rely=0, relwidth=1, relheight=1)
-            self._danger_flash.lift()
-        else:
-            self._danger_flash.place_forget()
-        self.after(120, lambda: self._flash_danger(step + 1))
+        self.camera_panel.preview_area.configure(border_color=COLORS["critical"] if step % 2 == 0 and step < 6 else COLORS["border"], border_width=2 if step < 6 else 1)
+        if step < 6:
+            self.after(180, lambda: self._flash_danger(step + 1))
 
     def _on_camera_status_from_worker(self, metadata: dict[str, Any]) -> None:
-        self.after(0, lambda: self.camera_panel.set_status(stream_state=str(metadata.get("message", ""))))
+        self._post_ui(lambda: self.camera_panel.set_status(stream_state=str(metadata.get("message", ""))) if self._metadata_is_current(metadata) else None)
 
     def _on_error_from_worker(self, message: str) -> None:
-        self.after(0, lambda: self._show_error(message))
+        self._post_ui(lambda: self._show_error(message))
 
     def _show_error(self, message: str) -> None:
         messagebox.showerror("Wildlife Alert System", message)
@@ -563,7 +686,8 @@ class Dashboard(ctk.CTk):
                 f"Confidence: {confidence:.0%}\n"
                 f"Time: {video_time}\n\n"
                 f"{event.get('message', '')}\n\n"
-                f"Notification: {notification_line}"
+                f"SMS: {notification_line}\n"
+                f"Calls: {event.get('call_status', 'disabled')}"
             ),
             text_color=COLORS["text"],
             justify="left",
@@ -598,9 +722,10 @@ class Dashboard(ctk.CTk):
         ).grid(row=0, column=1, sticky="ew", padx=5)
         ctk.CTkButton(
             button_row,
-            text="Enable SMS",
-            command=self.focus_settings,
+            text="SMS Settings",
+            command=lambda: (popup.destroy(), self.focus_settings()),
             fg_color=COLORS["accent"],
+            text_color=COLORS["accent_text"],
             hover_color=COLORS["accent_hover"],
             corner_radius=6,
         ).grid(row=0, column=2, sticky="ew", padx=5)
@@ -626,8 +751,10 @@ class Dashboard(ctk.CTk):
             self.notification_log_panel.update_logs(self.notification_service.load_notification_log())
 
     def _on_close(self) -> None:
+        self._closing = True
+        self.demo_service.stop(wait=True, reset=False)
         self.camera_service.stop(wait=False)
-        self.video_service.stop(wait=False, reset=False)
+        self.video_service.stop(wait=True, reset=False)
         self.clip_service.finalize_all()
         self.siren_service.stop()
         self.destroy()

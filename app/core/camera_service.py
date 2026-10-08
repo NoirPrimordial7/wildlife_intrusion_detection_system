@@ -69,14 +69,18 @@ class CameraService:
         prediction_interval_seconds: float | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> None:
-        if self._running:
+        if self._thread and self._thread.is_alive():
+            if not self._stop_event.is_set():
+                return
+            self.error_callback("Previous camera session is still stopping. Try again in a moment.")
             return
         source_type = _normalize_source_type(source_type)
         if prediction_interval_seconds is not None:
             self.prediction_interval_seconds = max(0.25, float(prediction_interval_seconds))
         self._source_type = source_type
         self._source_path = source_path
-        self._stop_event.clear()
+        self._stop_event = threading.Event()
+        self._running = True
         self._thread = threading.Thread(
             target=self._run,
             args=(source_type, source_path, metadata or {}),
@@ -137,9 +141,12 @@ class CameraService:
                                 "playback_fps": 0.0,
                             }
                         )
-                        self.prediction_callback(prediction, frame.copy(), prediction_metadata)
+                        if not self._stop_event.is_set():
+                            self.prediction_callback(prediction, frame.copy(), prediction_metadata)
                     except Exception as exc:
-                        self.error_callback(f"Prediction failed: {exc}")
+                        if not self._stop_event.is_set():
+                            self.error_callback(f"Prediction failed: {exc}")
+                        break
 
                 time.sleep(0.01)
         finally:

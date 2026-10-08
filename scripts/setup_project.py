@@ -32,8 +32,8 @@ def check_files() -> bool:
 
 
 def check_python() -> bool:
-    ok = sys.version_info[:2] == (3, 10)
-    print_status("Python 3.10", ok, sys.version.split()[0])
+    ok = (3, 10) <= sys.version_info[:2] <= (3, 12)
+    print_status("Python 3.10-3.12", ok, sys.version.split()[0])
     return ok
 
 

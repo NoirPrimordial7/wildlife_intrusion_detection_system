@@ -87,6 +87,7 @@ class ReportService:
                     f"  Alert decision time: {float(event.get('alert_decision_time_ms', 0.0)):.2f} ms",
                     f"  Playback FPS: {float(event.get('playback_fps', 0.0)):.2f}",
                     f"  Notification status: {event.get('notification_status', '--')}",
+                    f"  Voice call status: {event.get('call_status', 'disabled')} (queued means provider accepted, not answered)",
                     f"  Snapshot path: {event.get('snapshot_path', '')}",
                     f"  Location note: {event.get('location_note', '')}",
                     "",

@@ -28,8 +28,8 @@ class NotificationLogPanel(ctk.CTkFrame):
         actions = ctk.CTkFrame(self, fg_color="transparent")
         actions.grid(row=1, column=0, sticky="ew", padx=16, pady=(0, 8))
         actions.grid_columnconfigure((0, 1), weight=1)
-        ctk.CTkButton(actions, text="Clear Notification Log", height=28, corner_radius=6, fg_color=COLORS["danger"], hover_color="#a93434", command=self.on_clear).grid(row=0, column=0, sticky="ew", padx=(0, 4))
-        ctk.CTkButton(actions, text="Export Notification Log", height=28, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self.on_export).grid(row=0, column=1, sticky="ew", padx=(4, 0))
+        ctk.CTkButton(actions, text="Clear log", width=95, height=28, corner_radius=6, fg_color=COLORS["danger"], hover_color="#a93434", command=self.on_clear).grid(row=0, column=0, sticky="ew", padx=(0, 4))
+        ctk.CTkButton(actions, text="Export log", width=95, height=28, corner_radius=6, fg_color=COLORS["surface_alt"], hover_color=COLORS["accent_hover"], command=self.on_export).grid(row=0, column=1, sticky="ew", padx=(4, 0))
         self.rows_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.rows_frame.grid(row=2, column=0, sticky="ew", padx=12, pady=(0, 12))
         self.rows_frame.grid_columnconfigure(0, weight=1)
@@ -46,7 +46,7 @@ class NotificationLogPanel(ctk.CTkFrame):
             preview = str(row.get("message", ""))[:80]
             text = (
                 f"{row.get('timestamp', '--')} | {row.get('user_name', '--')}\n"
-                f"{mask_phone(row.get('phone', ''))} | {row.get('provider', '--')} | {row.get('status', '--')}\n"
+                f"{mask_phone(row.get('phone', ''))} | {row.get('channel', 'sms').upper()} | {row.get('provider', '--')} | {row.get('status', '--')}\n"
                 f"{preview}"
             )
             label = ctk.CTkLabel(

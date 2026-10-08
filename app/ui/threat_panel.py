@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from pathlib import Path
 
 import customtkinter as ctk
 
@@ -41,6 +42,9 @@ class ThreatPanel(ctk.CTkFrame):
         self.classifier_label = self._line(self.detection_card, 4, "Classifier: --")
         self.processing_label = self._line(self.detection_card, 5, "Processing: --")
         self.mode_label = self._line(self.detection_card, 6, "Detection Mode: Hybrid YOLO + Classifier")
+        self.confidence_meter = ctk.CTkProgressBar(self.detection_card, height=6, progress_color=COLORS["accent"])
+        self.confidence_meter.set(0)
+        self.confidence_meter.grid(row=7, column=0, sticky="ew", padx=16, pady=(10, 16))
 
         self.camera_card = self._card(2, "Camera Info")
         self.camera_id_label = self._line(self.camera_card, 1, "Camera ID: CAM_01")
@@ -52,7 +56,7 @@ class ThreatPanel(ctk.CTkFrame):
         self.sms_provider_label = self._line(self.sms_card, 2, "SMS Provider: Twilio")
         self.sms_users_label = self._line(self.sms_card, 3, "Registered users: 0")
         self.sms_last_label = self._line(self.sms_card, 4, "Last notification: --")
-        self.sms_hint_label = self._line(self.sms_card, 5, "Open SMS Settings from Video Evidence")
+        self.sms_hint_label = self._line(self.sms_card, 5, "Voice calls: Disabled / configure in Settings")
 
     def _card(self, row: int, title: str) -> ctk.CTkFrame:
         frame = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=8)
@@ -93,6 +97,7 @@ class ThreatPanel(ctk.CTkFrame):
         confidence = float(prediction.get("confidence", 0.0))
         self.animal_label.configure(text=f"Animal: {animal}")
         self.confidence_label.configure(text=f"Confidence: {confidence:.1%}")
+        self.confidence_meter.set(max(0, min(1, confidence)))
         primary = self._primary_detection(prediction)
         if primary:
             self.yolo_label.configure(text=f"YOLO: {primary.get('yolo_label', '--')} {float(primary.get('yolo_confidence', 0.0)):.1%}")
@@ -118,7 +123,7 @@ class ThreatPanel(ctk.CTkFrame):
         self.location_label.configure(text=f"Location: {config.get('camera_location', 'Village Border Camera')}")
         source_text = source_type
         if source_path:
-            source_text = f"{source_type}: {source_path}"
+            source_text = f"{source_type}: {Path(source_path).name}"
         self.source_label.configure(text=f"Source: {source_text or 'idle'}")
 
     def update_sms_status(self, status: dict[str, Any]) -> None:
@@ -131,3 +136,4 @@ class ThreatPanel(ctk.CTkFrame):
         error = status.get("last_error")
         suffix = f" ({error})" if error else ""
         self.sms_last_label.configure(text=f"Last notification: {last}{suffix}")
+        self.sms_hint_label.configure(text="Voice calls: " + ("Enabled (Twilio)" if status.get("voice_enabled") else "Disabled"))

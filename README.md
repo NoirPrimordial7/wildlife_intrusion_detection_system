@@ -1,4 +1,27 @@
-# AI Wildlife Intrusion Detection and Alert System
+# VanRakshak / Wildlife Watch
+
+An improved desktop field-monitoring interface around the original YOLO + species-classifier pipeline.
+
+**Start here:** [QUICKSTART.md](QUICKSTART.md). Extract the project and double-click `START.bat` on Windows with 64-bit Python 3.10â€“3.12 installed. First launch installs the packages; later launches reuse them.
+
+```powershell
+.\START.bat
+```
+
+New: forest palette, reorganized inspector tabs, compact video controls, readable detection bookmarks, built-in guided simulation, validated settings, editable provider credentials, and optional Twilio voice calls. The simulation is explicitly labelled and creates no real alerts or notifications. SMS/calls are disabled until configured. Calls use the same confirmation/cooldown rules as text alerts.
+
+The app remains a prototype with the original trained model and broad YOLO classes; the UI refresh does not claim improved model accuracy. Voice requests are logged as queued on API acceptance, which does not mean answered. See [Twilio's call API](https://www.twilio.com/docs/voice/api/call-resource).
+
+Regression checks (after setup):
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe scripts\verify_ui.py
+```
+
+The tests use temporary data and mocked providers; they never send real texts/calls.
+
+## Original detection and provider details
 
 ## Current Scope
 
@@ -6,7 +29,7 @@ This is a PC-based wildlife intrusion detection prototype. The main demo is:
 
 1. Run the desktop app.
 2. Upload a wildlife video or start webcam monitoring.
-3. Click `Start Detection`.
+3. Click `Start`.
 4. The system runs YOLOv8 on sampled frames and draws bounding boxes around animal-like objects.
 5. Each YOLO crop is classified by the existing `.h5` model.
 6. If a dangerous animal is confirmed, a `DANGER` alert triggers.
@@ -266,8 +289,7 @@ The current `.h5` model is image classification, not object detection. YOLOv8 no
 ## Run App
 
 ```powershell
-cd C:\projects\VanRakshak\wildlife_alert_system_clean
-.\.venv\Scripts\python.exe app\main.py
+.\START.bat
 ```
 
 ## Fresh Windows PC Setup
@@ -316,7 +338,7 @@ docs/FRESH_MACOS_SETUP.md
 ## Demo Detection Flow
 
 1. Upload a video.
-2. Click `Start Detection`.
+2. Click `Start`.
 3. The app keeps video playback smooth and runs Hybrid YOLO + Classifier checks at the selected interval.
 4. The UI shows `AI Monitoring Active`, next check timing, and last checked frame/time.
 5. Bounding boxes are drawn directly from Hybrid YOLO detections with labels like `Tiger 92% | YOLO: bear 71%`.

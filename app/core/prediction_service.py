@@ -56,7 +56,7 @@ class PredictionService:
                 raise FileNotFoundError(f"Model not found: {self.model_path}")
             from tensorflow.keras.models import load_model
 
-            self._model = load_model(str(self.model_path))
+            self._model = load_model(str(self.model_path), compile=False)
         _ = self.class_names
         if self._animal_info_index is None:
             self._animal_info_index = self._load_animal_info()

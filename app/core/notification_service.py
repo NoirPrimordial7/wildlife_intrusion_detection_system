@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import shutil
 import re
+import threading
+from xml.sax.saxutils import escape
 from typing import Any
 
 from app.utils.paths import (
@@ -18,6 +20,7 @@ from app.utils.time_utils import iso_timestamp
 
 DEFAULT_SMS_CONFIG = {
     "enabled": False,
+    "voice_enabled": False,
     "provider": "twilio",
     "twilio": {
         "account_sid": "",
@@ -80,6 +83,7 @@ class NotificationService:
         self.notification_log_path = NOTIFICATION_LOG_PATH
         self.sms_config_path = SMS_CONFIG_PATH
         self.sms_config_example_path = SMS_CONFIG_EXAMPLE_PATH
+        self._log_lock = threading.Lock()
         self.ensure_files()
 
     def ensure_files(self) -> None:
@@ -124,6 +128,7 @@ class NotificationService:
         last = self.last_notification()
         return {
             "enabled": bool(config.get("enabled")),
+            "voice_enabled": bool(config.get("voice_enabled")),
             "provider": str(config.get("provider", "twilio")),
             "registered_users_count": len(users),
             "last_status": str(last.get("status", "--")) if last else "--",
@@ -135,11 +140,22 @@ class NotificationService:
         config = self.load_sms_config()
         if "enabled" in updates:
             config["enabled"] = parse_bool(updates["enabled"])
+        if "voice_enabled" in updates:
+            config["voice_enabled"] = parse_bool(updates["voice_enabled"])
         if "provider" in updates:
             provider = str(updates["provider"]).strip().casefold().replace(" ", "_")
             if provider not in {"twilio", "fast2sms", "generic_http"}:
                 raise ValueError(f"Unsupported SMS provider: {updates['provider']}")
             config["provider"] = provider
+        for provider_key in ("twilio", "fast2sms", "generic_http"):
+            if provider_key in updates:
+                if not isinstance(updates[provider_key], dict):
+                    raise ValueError("Provider credentials must be an object")
+                # Only accept known fields; keep unrelated provider settings intact.
+                allowed = DEFAULT_SMS_CONFIG[provider_key]
+                for key, value in updates[provider_key].items():
+                    if key in allowed:
+                        config[provider_key][key] = str(value).strip()
         save_json(self.sms_config_path, config)
         return self.load_sms_config()
 
@@ -176,7 +192,8 @@ class NotificationService:
         return logs if isinstance(logs, list) else []
 
     def clear_notification_log(self) -> None:
-        save_json(self.notification_log_path, [])
+        with self._log_lock:
+            save_json(self.notification_log_path, [])
 
     def export_notification_log(self) -> str:
         REPORTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -237,6 +254,40 @@ class NotificationService:
             return self.send_sms_generic_http(user, message, config)
         return self._log_notification(user, message, provider, "failed", f"Unsupported SMS provider: {provider}")
 
+    def send_alert_calls(self, alert_event: dict[str, Any]) -> list[dict[str, Any]]:
+        config = self.load_sms_config()
+        if not config.get("voice_enabled"):
+            return []
+        return [self.send_voice_call(user, self.message_for_event(alert_event), config)
+                for user in self.load_registered_users() if user.get("enabled", True)]
+
+    def send_test_call(self, user: dict[str, Any]) -> dict[str, Any]:
+        return self.send_voice_call(user, "This is a Van Rakshak test call. Wildlife phone alerts are configured.")
+
+    def send_voice_call(self, user, message, config=None):
+        config = config or self.load_sms_config()
+        def log(status, error=None, extra=None):
+            return self._log_notification(user, message, "twilio", status, error, {"channel": "voice", **(extra or {})})
+        if not config.get("voice_enabled"):
+            return log("disabled", "Voice calls are disabled in Settings.")
+        phone = str(user.get("phone", "")).strip()
+        if not is_valid_phone(phone):
+            return log("failed", "A valid international recipient phone number is required.")
+        credentials = config.get("twilio", {})
+        sid, token, sender = (str(credentials.get(key, "")).strip() for key in ("account_sid", "auth_token", "from_number"))
+        if not all((sid, token, sender)):
+            return log("failed", "Twilio account SID, auth token and a voice-capable sender number are required.")
+        try:
+            from twilio.rest import Client
+            from twilio.http.http_client import TwilioHttpClient
+            client = Client(sid, token, http_client=TwilioHttpClient(timeout=15))
+            call = client.calls.create(to=phone, from_=sender,
+                                       twiml=f"<Response><Say>{escape(str(message))}</Say></Response>", timeout=25)
+            # API acceptance does not prove that the recipient answered.
+            return log("queued", extra={"call_sid": getattr(call, "sid", ""), "provider_status": getattr(call, "status", "queued")})
+        except Exception as exc:
+            return log("failed", self._mask_error(str(exc), sid, token, sender, phone))
+
     def send_sms_twilio(
         self,
         user: dict[str, Any],
@@ -256,7 +307,8 @@ class NotificationService:
             return self._log_notification(user, message, "twilio", "failed", "Twilio package missing. Run: pip install twilio")
 
         try:
-            client = Client(account_sid, auth_token)
+            from twilio.http.http_client import TwilioHttpClient
+            client = Client(account_sid, auth_token, http_client=TwilioHttpClient(timeout=15))
             sent = client.messages.create(body=message, from_=from_number, to=str(user.get("phone", "")))
             return self._log_notification(user, message, "twilio", "sent", None, {"message_sid": getattr(sent, "sid", "")})
         except Exception as exc:
@@ -345,6 +397,7 @@ class NotificationService:
     def _merge_sms_config(self, loaded: dict[str, Any]) -> dict[str, Any]:
         config = {
             "enabled": parse_bool(loaded.get("enabled", DEFAULT_SMS_CONFIG["enabled"])),
+            "voice_enabled": parse_bool(loaded.get("voice_enabled", False)),
             "provider": str(loaded.get("provider", DEFAULT_SMS_CONFIG["provider"])),
             "twilio": DEFAULT_SMS_CONFIG["twilio"].copy(),
             "fast2sms": DEFAULT_SMS_CONFIG["fast2sms"].copy(),
@@ -398,14 +451,16 @@ class NotificationService:
             "message": message,
             "provider": provider,
             "status": status,
+            "channel": "sms",
             "error": error,
         }
         if extra:
             row.update(extra)
-        logs = load_json(self.notification_log_path, [])
-        if not isinstance(logs, list):
-            logs = []
-        logs.append(row)
-        save_json(self.notification_log_path, logs)
-        print(f"[SMS {provider.upper()}] {status}: {message}")
+        with self._log_lock:
+            logs = load_json(self.notification_log_path, [])
+            if not isinstance(logs, list):
+                logs = []
+            logs.append(row)
+            save_json(self.notification_log_path, logs)
+        print(f"[{row['channel'].upper()} {provider.upper()}] {status}: {message}")
         return row

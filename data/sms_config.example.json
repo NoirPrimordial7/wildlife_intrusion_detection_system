@@ -16,5 +16,6 @@
     "api_url": "",
     "api_key": "",
     "method": "POST"
-  }
+  },
+  "voice_enabled": false
 }

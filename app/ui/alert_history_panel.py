@@ -106,7 +106,8 @@ class AlertHistoryPanel(ctk.CTkFrame):
         button = ctk.CTkButton(
             parent,
             text=text,
-            width=128,
+            width=100,
+            text_color=COLORS["accent_text"] if path else COLORS["text"],
             height=28,
             corner_radius=6,
             fg_color=COLORS["accent"] if path else COLORS["border"],

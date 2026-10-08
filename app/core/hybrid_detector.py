@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import threading
 from typing import Any
 
 import numpy as np
@@ -29,6 +30,7 @@ class HybridDetector:
         classifier: PredictionService,
         yolo_detector: YoloDetector | None = None,
     ) -> None:
+        self._prediction_lock = threading.Lock()
         self.classifier = classifier
         self.yolo_detector = yolo_detector or YoloDetector()
         self.config = self.load_config()
@@ -70,6 +72,11 @@ class HybridDetector:
         return config
 
     def predict_frame(self, frame: np.ndarray) -> dict[str, Any]:
+        # Serialize model access while workers from an old source finish stopping.
+        with self._prediction_lock:
+            return self._predict_frame(frame)
+
+    def _predict_frame(self, frame: np.ndarray) -> dict[str, Any]:
         started_at = time.perf_counter()
         detections: list[dict[str, Any]] = []
         yolo_error = ""
