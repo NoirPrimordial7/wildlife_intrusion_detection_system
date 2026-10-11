@@ -354,3 +354,7 @@ docs/FRESH_MACOS_SETUP.md
 .\.venv\Scripts\python.exe scripts\evaluate_hybrid_on_video.py --help
 .\.venv\Scripts\python.exe app\main.py
 ```
+
+## Contributing and questions
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, validation and contribution guidance. Use the [issue templates](https://github.com/NoirPrimordial7/wildlife_intrusion_detection_system/issues/new/choose) for reproducible bugs and focused feature proposals, or [Discussions](https://github.com/NoirPrimordial7/wildlife_intrusion_detection_system/discussions) for setup questions and explanations.
